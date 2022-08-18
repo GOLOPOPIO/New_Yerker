@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="New_Yerker.MainPage">
+
+    <StackLayout BackgroundColor="WhiteSmoke" >
+
+        <StackLayout
+            Orientation="Horizontal"
+            BackgroundColor="Black">
+            <Entry 
+                BackgroundColor="Black"
+                Placeholder="Артикул"
+                PlaceholderColor="LightGray"
+                TextColor="White"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button 
+                BackgroundColor="Red"
+                VerticalOptions="EndAndExpand"
+                Margin="5"/>
+        </StackLayout>
+        
+        <ScrollView BackgroundColor="WhiteSmoke">
+            <StackLayout
+                VerticalOptions="FillAndExpand"
+                BackgroundColor="WhiteSmoke">
+                <Button 
+                    BackgroundColor="Ivory" 
+                    HorizontalOptions="FillAndExpand"/>
+                <Button 
+                    BackgroundColor="Ivory" 
+                    HorizontalOptions="FillAndExpand"/>
+                <Button 
+                    BackgroundColor="Ivory" 
+                    HorizontalOptions="FillAndExpand"/>
+                <Button 
+                    BackgroundColor="Ivory" 
+                    HorizontalOptions="FillAndExpand"/>
+                <Button 
+                    BackgroundColor="Ivory" 
+                    HorizontalOptions="FillAndExpand"/>
+            </StackLayout>
+        </ScrollView>
+        <StackLayout 
+            Orientation="Horizontal" 
+            HorizontalOptions="Fill" 
+            VerticalOptions="EndAndExpand" 
+            Padding="5,5,5,5" 
+            BackgroundColor="Black"
+            Spacing="5">
+            <Button BackgroundColor="Red" HorizontalOptions="StartAndExpand">
+
+            </Button>
+            <Button BackgroundColor="Red" HorizontalOptions="EndAndExpand">
+
+            </Button>
+        </StackLayout>
+    </StackLayout>
+</ContentPage>
