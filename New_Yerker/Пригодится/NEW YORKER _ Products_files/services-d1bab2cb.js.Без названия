@@ -1,0 +1,74 @@
+import { c as config, C as CUSTOMER_SERVICE_KEY, a as CustomerService, b as COUNTRY_SERVICE_KEY, d as CountryService, T as TRANSLATION_SERVICE_KEY, e as TranslationService } from './country-service-7afd87f9.js';
+import { C as CUSTOMER_GROUP_SERVICE_KEY, a as CustomerGroupService } from './customer-group-5a35cbad.js';
+import { C as COMPETITION_SERVICE_KEY, a as CompetitionService } from './competition-service-292753e9.js';
+import { T as TRACKING_SERVICE_KEY, a as TrackingService } from './tracking-service-3cf38bb3.js';
+
+class Referral {
+    constructor(values) {
+        this.number = values.number;
+        this.token = values.token;
+        this.createdAt = values.createdAt;
+        this.updatedAt = values.updatedAt;
+    }
+}
+
+const EMPLOYEE_SERVICE_KEY = 'NY_EMPLOYEE_SERVICE';
+class EmployeeService {
+    async registerReferral(firstName, lastName, employeeNumber) {
+        const response = await fetch(`${config.customerServiceUrl}/employee/referral/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                number: employeeNumber
+            })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error("could not register referral: " + error.message);
+        }
+        return new Referral(await response.json());
+    }
+    async referralCollect(token, customerId) {
+        const response = await fetch(`${config.customerServiceUrl}/employee/referral/collect`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: token,
+                profileId: customerId,
+            })
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error("could not collect referral: " + data.message);
+        }
+    }
+}
+
+if (!window[CUSTOMER_GROUP_SERVICE_KEY]) {
+    window[CUSTOMER_GROUP_SERVICE_KEY] = new CustomerGroupService();
+}
+if (!window[EMPLOYEE_SERVICE_KEY]) {
+    window[EMPLOYEE_SERVICE_KEY] = new EmployeeService();
+}
+if (!window[CUSTOMER_SERVICE_KEY]) {
+    window[CUSTOMER_SERVICE_KEY] = new CustomerService();
+}
+if (!window[COUNTRY_SERVICE_KEY]) {
+    window[COUNTRY_SERVICE_KEY] = new CountryService();
+}
+if (!window[TRANSLATION_SERVICE_KEY]) {
+    window[TRANSLATION_SERVICE_KEY] = new TranslationService();
+}
+if (!window[COMPETITION_SERVICE_KEY]) {
+    window[COMPETITION_SERVICE_KEY] = new CompetitionService();
+}
+if (!window[TRACKING_SERVICE_KEY]) {
+    window[TRACKING_SERVICE_KEY] = new TrackingService();
+}
+//# sourceMappingURL=services-d1bab2cb.js.map

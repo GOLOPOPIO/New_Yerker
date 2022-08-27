@@ -11,31 +11,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="View\Source\f4c00eb3c5a97809a621db55fe1c459a.png" />
-    <None Remove="View\Source\logo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="View\Source\f4c00eb3c5a97809a621db55fe1c459a.png" />
-    <EmbeddedResource Include="View\Source\logo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2196" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Model\DataBaseModel\" />
-    <Folder Include="Model\LoadModel\" />
-    <Folder Include="Model\ParsModel\" />
+    <Folder Include="Model\DataBase\" />
+    <Folder Include="Model\Load\" />
     <Folder Include="ViewModel\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="View\Source\f4c00eb3c5a97809a621db55fe1c459a.png" />
-    <Resource Include="View\Source\logo.png" />
   </ItemGroup>
 
   <ItemGroup>

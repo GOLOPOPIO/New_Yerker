@@ -9,7 +9,7 @@
             Orientation="Horizontal" 
             HorizontalOptions="Fill" 
             VerticalOptions="EndAndExpand" 
-            Padding="5,5,5,5" 
+            Padding="5" 
             BackgroundColor="Black"
             Spacing="0">
             <Label 
@@ -22,12 +22,13 @@
                 HorizontalOptions="CenterAndExpand"/>
             <Label 
                 HorizontalOptions="Start"
-                TextColor="DarkGray"
+                TextColor="Black"
                 Text="0.0.1"
                 FontSize="Micro"/>
         </StackLayout>
 <!--Список товаров-->
-        <ScrollView BackgroundColor="WhiteSmoke">
+        <ScrollView 
+            BackgroundColor="WhiteSmoke">
             <StackLayout
                 VerticalOptions="FillAndExpand"
                 BackgroundColor="WhiteSmoke">
@@ -53,6 +54,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Новая : 1699"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="Tomato"
                             FontSize="Small"/>
@@ -61,6 +63,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Старая : 2399"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="White"
                             FontSize="Small"/>
@@ -88,7 +91,8 @@
                     WidthRequest="200"
                     HeightRequest="200"/>
                     <StackLayout 
-                        HorizontalOptions="FillAndExpand">
+                        HorizontalOptions="FillAndExpand"
+                        Margin="5">
                         <Label 
                             HorizontalOptions="CenterAndExpand" 
                             VerticalOptions="StartAndExpand"
@@ -101,6 +105,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Новая : 1699"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="Tomato"
                             FontSize="Small"/>
@@ -109,6 +114,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Старая : 2399"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="White"
                             FontSize="Small"/>
@@ -136,7 +142,8 @@
                     WidthRequest="200"
                     HeightRequest="200"/>
                     <StackLayout 
-                        HorizontalOptions="FillAndExpand">
+                        HorizontalOptions="FillAndExpand"
+                        Margin="5">
                         <Label 
                             HorizontalOptions="CenterAndExpand" 
                             VerticalOptions="StartAndExpand"
@@ -149,6 +156,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Новая : 1699"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="Tomato"
                             FontSize="Small"/>
@@ -157,6 +165,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Старая : 2399"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="White"
                             FontSize="Small"/>
@@ -184,7 +193,8 @@
                     WidthRequest="200"
                     HeightRequest="200"/>
                     <StackLayout 
-                        HorizontalOptions="FillAndExpand">
+                        HorizontalOptions="FillAndExpand"
+                        Margin="5">
                         <Label 
                             HorizontalOptions="CenterAndExpand" 
                             VerticalOptions="StartAndExpand"
@@ -197,6 +207,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Новая : 1699"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="Tomato"
                             FontSize="Small"/>
@@ -205,6 +216,7 @@
                             VerticalOptions="Center"
                             HorizontalTextAlignment="Center" 
                             Text="Старая : 2399"
+                            Padding="3"
                             TextColor="Black"
                             BackgroundColor="White"
                             FontSize="Small"/>
@@ -224,60 +236,14 @@
                             FontSize="Small"/>
                     </StackLayout>
                 </StackLayout>
-                <StackLayout 
-                    Orientation="Horizontal"
-                    BackgroundColor="Ivory">
-                    <Image 
-                    BackgroundColor="Red"
-                    WidthRequest="200"
-                    HeightRequest="200"/>
-                    <StackLayout 
-                        HorizontalOptions="FillAndExpand">
-                        <Label 
-                            HorizontalOptions="CenterAndExpand" 
-                            VerticalOptions="StartAndExpand"
-                            HorizontalTextAlignment="Center" 
-                            Text="Футболка с круглым вырезом"
-                            TextColor="Black"
-                            FontSize="Medium"/>
-                        <Label 
-                            HorizontalOptions="CenterAndExpand" 
-                            VerticalOptions="Center"
-                            HorizontalTextAlignment="Center" 
-                            Text="Новая : 1699"
-                            TextColor="Black"
-                            BackgroundColor="Tomato"
-                            FontSize="Small"/>
-                        <Label 
-                            HorizontalOptions="CenterAndExpand" 
-                            VerticalOptions="Center"
-                            HorizontalTextAlignment="Center" 
-                            Text="Старая : 2399"
-                            TextColor="Black"
-                            BackgroundColor="White"
-                            FontSize="Small"/>
-                        <Label 
-                            HorizontalOptions="CenterAndExpand" 
-                            VerticalOptions="EndAndExpand"
-                            HorizontalTextAlignment="Center" 
-                            Text="01011020000"
-                            TextColor="Black"
-                            FontSize="Small"/>
-                        <Label 
-                            HorizontalOptions="CenterAndExpand" 
-                            VerticalOptions="End"
-                            HorizontalTextAlignment="Center" 
-                            Text="111111111111111111111"
-                            TextColor="Black"
-                            FontSize="Small"/>
-                    </StackLayout>
-                </StackLayout>
+             
             </StackLayout>
         </ScrollView>
 <!--Поиск-->
         <StackLayout
             Orientation="Horizontal"
-            BackgroundColor="Black">
+            BackgroundColor="Black"
+            Padding="0">
             <Entry 
                 BackgroundColor="Black"
                 Placeholder="Артикул"
@@ -289,10 +255,10 @@
             <Button 
                 BackgroundColor="Red"
                 WidthRequest="70"
-                HeightRequest="50"
                 CornerRadius="20"
-                VerticalOptions="EndAndExpand"
-                Margin="5"/>
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="End"
+                Margin="6"/>
         </StackLayout>
 
     </StackLayout>

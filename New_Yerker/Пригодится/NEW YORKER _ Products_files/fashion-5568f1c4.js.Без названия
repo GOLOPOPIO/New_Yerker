@@ -1,0 +1,1523 @@
+import { g as getCountryService, c as config, a as CustomerService, h as getTranslationService } from './country-service-7afd87f9.js';
+import { g as getCustomerGroupService } from './customer-group-5a35cbad.js';
+import { _ as __decorate } from './vendor-128e1c8c.js';
+import { e, t, n, s, p } from './lit-element-b02881dc.js';
+
+var styles$9 = "#fader {\n  position: sticky;\n  height: 100vh;\n  top: 54px;\n}\n@media screen and (min-width: 1024px) {\n  #fader {\n    top: 0;\n  }\n}";
+
+var Theme;
+(function (Theme) {
+    Theme["LIGHT"] = "light";
+    Theme["DARK"] = "dark";
+    Theme["RED"] = "red";
+    Theme["NONE"] = "";
+})(Theme || (Theme = {}));
+var Tile;
+(function (Tile) {
+    Tile["LEFT"] = "LEFT_TILE";
+    Tile["RIGHT"] = "RIGHT_TILE";
+})(Tile || (Tile = {}));
+
+class ThemeObserver {
+    initObservables() {
+        this.entries = Array.from(document.querySelectorAll('item-fader, [theme]:not(fader-item)'));
+        const fader = this.entries.find(e => e.getActiveItem);
+        if (fader) {
+            // firefox has trouble to recognize whether the item-fader is back in view using the intersectionObserver. use this as fallback
+            this.useFallback(fader);
+        }
+        this.observer = new IntersectionObserver(entries => {
+            for (const e of entries) {
+                if (e.isIntersecting) {
+                    this.observerActive = true;
+                    if (e.target.getActiveItem) {
+                        const fader = e.target;
+                        this.setTheme(this, this.getThemeOf(fader.getActiveItem()));
+                    }
+                    else if (this.isTile(e.target)) {
+                        const index = this.indexOf(e.target);
+                        if ((index % 2)) {
+                            this.setTheme(this, this.getThemeOf(e.target), Tile.RIGHT);
+                        }
+                        else if (!(index % 2)) {
+                            this.setTheme(this, this.getThemeOf(e.target), Tile.LEFT);
+                        }
+                    }
+                    else {
+                        this.setTheme(this, this.getThemeOf(e.target));
+                    }
+                }
+                this.observerActive = false;
+            }
+        }, { threshold: [0.9], rootMargin: '80% 0% 0% 50%' });
+        this.entries.forEach(e => this.observer.observe(e));
+    }
+    useFallback(fader) {
+        document.addEventListener('scroll', () => {
+            if (window.scrollY <= window.innerHeight * 0.9 && !this.observerActive) {
+                this.setTheme(this, this.getThemeOf(fader.getActiveItem()));
+            }
+        });
+    }
+    setTheme(caller, theme, tile) {
+        this.currentTheme = theme;
+        window.dispatchEvent(new CustomEvent('ny-request-theme-change', { detail: { caller: caller, theme: theme, tile: tile } }));
+    }
+    getThemeOf(element) {
+        var _a;
+        return (_a = element === null || element === void 0 ? void 0 : element.getAttribute('theme')) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+    }
+    getCurrentTheme() {
+        return this.currentTheme;
+    }
+    isTile(element) {
+        return element.classList.contains('tile');
+    }
+    indexOf(element) {
+        var _a;
+        return (_a = this.entries.filter(e => e.classList.contains('tile'))) === null || _a === void 0 ? void 0 : _a.indexOf(element);
+    }
+}
+const themeObserver = new ThemeObserver();
+
+class Fader extends HTMLElement {
+    constructor() {
+        super();
+        this.currentIndex = 0;
+        this.FADER_TIMER = 5000;
+        this.timerTicker = this.timerTicker.bind(this);
+        this.itemAdded = this.itemAdded.bind(this);
+        this.startTimer = this.startTimer.bind(this);
+        this.playOnReady = this.playOnReady.bind(this);
+        window.addEventListener('ny-fader-item-added', this.itemAdded);
+    }
+    connectedCallback() {
+        this.root = this.attachShadow({ mode: 'open' });
+        this.root.innerHTML =
+            `
+      <style>${styles$9}</style>
+      <div id="fader">
+      <slot></slot>
+      </div>
+      `;
+    }
+    disconnectedCallback() {
+        clearInterval(this.timer);
+        window.removeEventListener('ny-fader-item-added', this.itemAdded);
+    }
+    static get() {
+        return document.querySelector('item-fader');
+    }
+    itemAdded() {
+        this.allItems = Array.from(this.querySelectorAll('fader-item'));
+        setTimeout(() => {
+            this.setNextItem(this.currentIndex);
+            themeObserver.setTheme(this, themeObserver.getThemeOf(this.activeItem));
+            if (this.activeItem.isVideo()) {
+                this.playOnReady();
+            }
+            else if (this.activeItem.isImage()) {
+                this.setSourceOnReady();
+            }
+        });
+    }
+    playOnReady() {
+        var _a;
+        const video = (_a = this.activeItem) === null || _a === void 0 ? void 0 : _a.getVideo();
+        if (video) {
+            if (video.readyState <= 3) {
+                this.stopTimer();
+                video.onloadedmetadata = video.play;
+                video.oncanplaythrough = this.startTimer;
+                video.load();
+            }
+            else {
+                video.play();
+            }
+        }
+    }
+    setSourceOnReady() {
+        var _a;
+        const picture = (_a = this.activeItem) === null || _a === void 0 ? void 0 : _a.getPicture();
+        if (picture) {
+            picture.childNodes.forEach((source) => {
+                if (source instanceof HTMLImageElement) {
+                    const image = source;
+                    image.onload = this.startTimer;
+                    if (!image.complete) {
+                        this.stopTimer();
+                    }
+                }
+                for (const srcAtt of Array.from(source.attributes)) {
+                    if (srcAtt.name.startsWith('data')) {
+                        const destAtt = srcAtt.name.substr(srcAtt.name.lastIndexOf('-') + 1, srcAtt.name.length - 1);
+                        if (!source.getAttribute(destAtt)) {
+                            source.setAttribute(destAtt, source.getAttribute(srcAtt.name));
+                        }
+                    }
+                }
+            });
+        }
+    }
+    getActiveItem() {
+        return this.activeItem;
+    }
+    setNextItem(index) {
+        for (let i = 0; i < this.allItems.length; i++) {
+            if (i < index)
+                this.allItems[i].setPast();
+            if (i === index)
+                this.allItems[i].setActive();
+            if (i === (index + 1))
+                this.allItems[i].setNext();
+            if (i > index)
+                this.allItems[i].setFuture();
+        }
+        this.activeItem = this.allItems[index];
+    }
+    timerTicker() {
+        if (this.activeItem.isVideo()) {
+            this.activeItem.getVideo().pause();
+        }
+        this.currentIndex += 1;
+        if (this.currentIndex >= this.allItems.length) {
+            this.currentIndex = 0;
+        }
+        this.setNextItem(this.currentIndex);
+        if (this.isInViewport()) {
+            themeObserver.setTheme(this, themeObserver.getThemeOf(this.activeItem));
+        }
+        if (this.activeItem.isVideo()) {
+            this.playOnReady();
+        }
+        if (this.activeItem.isImage()) {
+            this.setSourceOnReady();
+        }
+    }
+    isInViewport() {
+        return window.scrollY / window.innerHeight < 0.75;
+    }
+    startTimer() {
+        if (!this.timer) {
+            this.timer = setInterval(this.timerTicker, this.FADER_TIMER);
+        }
+    }
+    stopTimer() {
+        clearInterval(this.timer);
+        this.timer = null;
+    }
+}
+window.customElements.define('item-fader', Fader);
+
+var styles$8 = ":host {\n  display: block;\n  width: 100%;\n  height: 100%;\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n:host * {\n  box-sizing: border-box;\n}\n\n.fadeable {\n  z-index: 3;\n  visibility: hidden;\n  transition: all ease-in-out 750ms;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100vh;\n}\n.fadeable.future {\n  opacity: 0;\n  visibility: hidden;\n  z-index: 2;\n}\n.fadeable.future.next {\n  visibility: visible;\n  opacity: 0;\n}\n.fadeable.past {\n  opacity: 0;\n  visibility: hidden;\n  z-index: 1;\n}\n.fadeable.active {\n  opacity: 1;\n  visibility: visible;\n}\n\n.full-size-item {\n  position: relative;\n  width: 100vw;\n  height: 100vh;\n}\n.full-size-item picture > img,\n.full-size-item video {\n  display: block;\n  width: 100%;\n  height: calc(100vh - 3.375rem - 2.5rem);\n  object-fit: cover;\n}\n@media screen and (min-width: 1024px) {\n  .full-size-item picture > img,\n.full-size-item video {\n    height: 100vh;\n  }\n}\n.full-size-item.dark .item-content {\n  color: white;\n}\n.full-size-item.dark .item-content .item-brand {\n  color: #333333;\n}\n.full-size-item.dark .item-content .item-brand svg {\n  fill: #333333;\n}\n.full-size-item.dark .item-content .item-actions a {\n  color: white;\n  background: #333333;\n}\n.full-size-item .item-content {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.full-size-item .item-content > div {\n  height: 250px;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n  transform: translateY(-25%);\n}\n@media screen and (min-width: 1024px) {\n  .full-size-item .item-content {\n    align-items: flex-end;\n    padding-right: 10%;\n  }\n}\n@media screen and (max-width: 767px) {\n  .full-size-item .item-content.low {\n    justify-content: flex-end;\n    padding-bottom: 11rem;\n  }\n}\n.full-size-item .item-content .item-brand {\n  display: flex;\n  justify-content: center;\n  color: white;\n  margin-top: auto;\n}\n.full-size-item .item-content .item-brand svg {\n  fill: white;\n  width: 23rem;\n  height: 5rem;\n}\n.full-size-item .item-content .item-brand.blacksquad svg, .full-size-item .item-content .item-brand.fbs svg {\n  height: 9rem;\n}\n.full-size-item .item-content .item-actions {\n  display: flex;\n  margin-top: 1.5rem;\n  justify-content: center;\n}\n.full-size-item .item-content .item-actions a {\n  padding: 0.625rem 1rem;\n  border: none;\n  background: white;\n  font-size: 0.75rem;\n  text-transform: uppercase;\n  color: #333333;\n  letter-spacing: 0.075rem;\n  font-weight: 300;\n  margin-left: 0.75rem;\n  margin-right: 0.75rem;\n  text-decoration: none;\n  cursor: pointer;\n  width: 7.125rem;\n  height: 2.25rem;\n  text-align: center;\n}\n@media screen and (min-width: 1024px) {\n  .full-size-item .item-content .item-actions a {\n    font-size: 1rem;\n    padding: 0.625rem 2.25rem;\n    width: 11rem;\n    height: 2.5rem;\n  }\n}";
+
+class FaderItem extends HTMLElement {
+    constructor() {
+        super();
+        this.setActive = this.setActive.bind(this);
+        this.setNext = this.setNext.bind(this);
+        this.setFuture = this.setFuture.bind(this);
+        this.setPast = this.setPast.bind(this);
+        this.isImage = this.isImage.bind(this);
+        this.isVideo = this.isVideo.bind(this);
+    }
+    connectedCallback() {
+        var _a;
+        this.desktopSrc = this.getAttribute('desktopSrc') || this.desktopSrc;
+        this.desktopPreview = this.getAttribute('desktopPreview') || this.desktopPreview;
+        this.mobileSrc = this.getAttribute('mobileSrc') || this.mobileSrc;
+        this.mobilePreview = this.getAttribute('mobilePreview') || this.mobilePreview;
+        this.alt = this.getAttribute('alt') || this.alt;
+        this.theme = this.getAttribute('theme').toLowerCase() || this.theme;
+        this.position = this.getAttribute('position') || this.position;
+        this.brand = ((_a = this.getAttribute('brand')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || this.brand;
+        this.actionProducts = this.getAttribute('actionProducts') || this.actionProducts;
+        this.actionSpecial = this.getAttribute('actionSpecial') || this.actionSpecial;
+        this.translationButtonProduct = this.getAttribute('translationButtonProducts') || this.translationButtonProduct;
+        this.translationButtonSpecial = this.getAttribute('translationButtonSpecial') || this.translationButtonSpecial;
+        this.externalLinkProducts = this.getAttribute('externalLinkProducts') || this.externalLinkProducts;
+        this.externalLinkSpecial = this.getAttribute('externalLinkSpecial') || this.externalLinkSpecial;
+        this.type = this.getAttribute('type') || this.type;
+        this.langPrefix = this.getAttribute('langPrefix') || '';
+        this.renderItem();
+        window.dispatchEvent(new Event('ny-fader-item-added'));
+    }
+    renderItem() {
+        this.root = this.attachShadow({ mode: 'open' });
+        const style = document.createElement('style');
+        style.innerHTML = styles$8;
+        const fadeable = document.createElement('a');
+        if (this.externalLinkSpecial) {
+            fadeable.target = '_blank';
+            fadeable.href = this.actionSpecial;
+        }
+        else {
+            fadeable.href = this.langPrefix + this.actionSpecial;
+        }
+        fadeable.classList.add('fadeable');
+        const fullSizeItem = document.createElement('div');
+        fullSizeItem.classList.add('full-size-item');
+        fullSizeItem.classList.add(this.theme);
+        if (this.type === 'image') {
+            fullSizeItem.append(this.renderImage());
+        }
+        if (this.type === 'video') {
+            fullSizeItem.append(this.renderVideo());
+        }
+        const itemContent = document.createElement('div');
+        itemContent.classList.add('item-content');
+        itemContent.classList.add('low');
+        const div = document.createElement('div');
+        itemContent.appendChild(div);
+        fullSizeItem.appendChild(itemContent);
+        div.appendChild(this.renderBrand());
+        if (this.actionProducts) {
+            div.appendChild(this.renderActions());
+        }
+        fadeable.appendChild(fullSizeItem);
+        this.root.appendChild(style);
+        this.root.appendChild(fadeable);
+    }
+    renderBrand() {
+        const itemBrand = document.createElement('div');
+        itemBrand.classList.add('item-brand');
+        itemBrand.classList.add(this.brand);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `/img/icons/brands.svg#${this.brand}`);
+        svg.appendChild(use);
+        itemBrand.appendChild(svg);
+        return itemBrand;
+    }
+    renderActions() {
+        const itemActions = document.createElement('div');
+        itemActions.classList.add('item-actions');
+        const specialLink = document.createElement('a');
+        specialLink.innerHTML = this.translationButtonSpecial;
+        if (this.externalLinkSpecial) {
+            specialLink.target = '_blank';
+            specialLink.href = this.actionSpecial;
+        }
+        else {
+            specialLink.href = this.langPrefix + this.actionSpecial;
+        }
+        const productsLink = document.createElement('a');
+        productsLink.innerHTML = this.translationButtonProduct;
+        if (this.externalLinkProducts) {
+            productsLink.href = this.actionProducts;
+            productsLink.target = '_blank';
+        }
+        else {
+            productsLink.href = this.langPrefix + this.actionProducts;
+        }
+        itemActions.appendChild(specialLink);
+        itemActions.appendChild(productsLink);
+        return itemActions;
+    }
+    renderImage() {
+        const picture = document.createElement('picture');
+        const mobileSrc = document.createElement('source');
+        mobileSrc.media = '(max-width: 1024px)';
+        mobileSrc.setAttribute('data-srcset', this.mobileSrc);
+        const desktopSrc = document.createElement('source');
+        desktopSrc.media = '(min-width: 1024px)';
+        desktopSrc.setAttribute('data-srcset', this.desktopSrc);
+        picture.appendChild(mobileSrc);
+        picture.appendChild(desktopSrc);
+        const fallback = document.createElement('img');
+        fallback.alt = this.brand;
+        fallback.setAttribute('data-src', this.desktopSrc);
+        picture.appendChild(fallback);
+        return picture;
+    }
+    renderVideo() {
+        const video = document.createElement('video');
+        video.src = this.getVideoSrc();
+        if (this.desktopPreview && this.mobilePreview) {
+            video.poster = this.getVideoPreview();
+        }
+        video.autoplay = false;
+        video.preload = 'none';
+        video.loop = true;
+        video.muted = true;
+        video.setAttribute('playsinline', 'true');
+        return video;
+    }
+    getVideoSrc() {
+        if (screen.availWidth < 1024) {
+            return this.mobileSrc;
+        }
+        return this.desktopSrc;
+    }
+    getVideoPreview() {
+        if (screen.availWidth < 1024) {
+            return this.mobilePreview;
+        }
+        return this.desktopPreview;
+    }
+    setActive() {
+        const item = this.root.querySelector('.fadeable');
+        item.setAttribute('class', `fadeable active`);
+    }
+    setPast() {
+        const item = this.root.querySelector('.fadeable');
+        item.setAttribute('class', `fadeable past`);
+    }
+    setFuture() {
+        const item = this.root.querySelector('.fadeable');
+        item.setAttribute('class', `fadeable future`);
+    }
+    setNext() {
+        const item = this.root.querySelector('.fadeable');
+        item.setAttribute('class', `fadeable future next`);
+    }
+    getVideo() {
+        return this.root.querySelector('video');
+    }
+    getPicture() {
+        return this.root.querySelector('picture');
+    }
+    isVideo() {
+        return this.type === 'video';
+    }
+    isImage() {
+        return this.type === 'image';
+    }
+}
+window.customElements.define('fader-item', FaderItem);
+
+var styles$7 = ":host {\n  display: block;\n  width: 100%;\n  height: 100%;\n}\n:host * {\n  box-sizing: border-box;\n}\n\n.full-size-item {\n  position: relative;\n  width: 100vw;\n  height: 100vh;\n}\n.full-size-item picture,\n.full-size-item picture > img,\n.full-size-item video {\n  display: block;\n  width: 100%;\n  height: 100vh;\n  object-fit: cover;\n}\n.full-size-item.dark .item-content {\n  color: white;\n}\n.full-size-item.dark .item-content .item-brand {\n  color: #333333;\n}\n.full-size-item.dark .item-content .item-brand svg {\n  fill: #333333;\n}\n.full-size-item.dark .item-content .item-actions a {\n  color: white;\n  background: #333333;\n}\n.full-size-item .item-content {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n.full-size-item .item-content > div {\n  height: 250px;\n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n  transform: translateY(-25%);\n}\n@media screen and (min-width: 1024px) {\n  .full-size-item .item-content {\n    align-items: flex-end;\n    padding-right: 10%;\n  }\n}\n@media screen and (max-width: 767px) {\n  .full-size-item .item-content.low {\n    justify-content: flex-end;\n    padding-bottom: 4rem;\n  }\n}\n.full-size-item .item-content .item-brand {\n  display: flex;\n  justify-content: center;\n  color: white;\n  margin-top: auto;\n}\n.full-size-item .item-content .item-brand svg {\n  fill: white;\n  width: 23rem;\n  height: 5rem;\n}\n.full-size-item .item-content .item-brand.blacksquad svg, .full-size-item .item-content .item-brand.fbs svg {\n  height: 9rem;\n}\n.full-size-item .item-content .item-actions {\n  display: flex;\n  margin-top: 1.5rem;\n  justify-content: center;\n}\n.full-size-item .item-content .item-actions a {\n  padding: 0.625rem 1rem;\n  border: none;\n  background: white;\n  font-size: 0.75rem;\n  text-transform: uppercase;\n  color: #333333;\n  letter-spacing: 0.075rem;\n  font-weight: 300;\n  margin-left: 0.75rem;\n  margin-right: 0.75rem;\n  text-decoration: none;\n  cursor: pointer;\n  width: 7.125rem;\n  height: 2.25rem;\n  text-align: center;\n}\n@media screen and (min-width: 1024px) {\n  .full-size-item .item-content .item-actions a {\n    font-size: 1rem;\n    padding: 0.625rem 2.25rem;\n    width: 11rem;\n    height: 2.5rem;\n  }\n}";
+
+class ItemsObserver {
+    constructor() {
+        this.observer = new IntersectionObserver(this.onObserve, { threshold: 0.01, rootMargin: "50% 0px 50% 0px" });
+    }
+    onObserve(entries, self) {
+        for (const e of entries) {
+            if (e.target instanceof HTMLVideoElement) {
+                if (e.isIntersecting && e.target.paused) {
+                    e.target.onloadedmetadata = e.target.play;
+                    e.target.load();
+                    self.unobserve(e.target);
+                }
+            }
+            else if (e.target instanceof HTMLPictureElement) {
+                if (e.isIntersecting) {
+                    const picture = e.target;
+                    picture.childNodes.forEach((source) => {
+                        for (const srcAtt of Array.from(source.attributes)) {
+                            if (srcAtt.name.startsWith('data')) {
+                                const destAtt = srcAtt.name.substr(srcAtt.name.lastIndexOf('-') + 1, srcAtt.name.length - 1);
+                                source.setAttribute(destAtt, source.getAttribute(srcAtt.name));
+                            }
+                        }
+                    });
+                    self.unobserve(e.target);
+                }
+            }
+        }
+    }
+    addObservable(target) {
+        this.observer.observe(target);
+    }
+}
+const itemsObserver = new ItemsObserver();
+
+class BannerItem extends HTMLElement {
+    connectedCallback() {
+        var _a;
+        this.desktopSrc = this.getAttribute('desktopSrc') || this.desktopSrc;
+        this.desktopPreview = this.getAttribute('desktopPreview') || this.desktopPreview;
+        this.mobileSrc = this.getAttribute('mobileSrc') || this.mobileSrc;
+        this.mobilePreview = this.getAttribute('mobilePreview') || this.mobilePreview;
+        this.type = this.getAttribute('type') || this.type;
+        this.alt = this.getAttribute('alt') || this.alt;
+        this.theme = this.getAttribute('theme').toLowerCase() || this.theme;
+        this.position = this.getAttribute('position') || this.position;
+        this.brand = ((_a = this.getAttribute('brand')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || this.brand;
+        this.actionProducts = this.getAttribute('actionProducts') || this.actionProducts;
+        this.actionSpecial = this.getAttribute('actionSpecial') || this.actionSpecial;
+        this.translationButtonSpecial = this.getAttribute('translationButtonSpecial') || this.translationButtonSpecial;
+        this.translationButtonProducts = this.getAttribute('translationButtonProducts') || this.translationButtonProducts;
+        this.externalLinkSpecial = this.getAttribute('externalLinkSpecial') || this.externalLinkSpecial;
+        this.externalLinkProducts = this.getAttribute('externalLinkProducts') || this.externalLinkProducts;
+        this.langPrefix = this.getAttribute('langPrefix') || '';
+        this.renderItem();
+    }
+    renderItem() {
+        this.root = this.attachShadow({ mode: 'open' });
+        const style = document.createElement('style');
+        style.innerHTML = styles$7;
+        const fadeable = document.createElement('a');
+        if (this.externalLinkSpecial) {
+            fadeable.target = '_blank';
+            fadeable.href = this.actionSpecial;
+        }
+        else {
+            fadeable.href = this.langPrefix + this.actionSpecial;
+        }
+        fadeable.classList.add('fadeable');
+        const fullSizeItem = document.createElement('div');
+        fullSizeItem.classList.add('full-size-item');
+        fullSizeItem.classList.add(this.theme);
+        if (this.type === 'image') {
+            fullSizeItem.append(this.renderImage());
+        }
+        if (this.type === 'video') {
+            fullSizeItem.append(this.renderVideo());
+        }
+        const itemContent = document.createElement('div');
+        itemContent.classList.add('item-content');
+        itemContent.classList.add('low');
+        const div = document.createElement('div');
+        itemContent.appendChild(div);
+        fullSizeItem.appendChild(itemContent);
+        div.appendChild(this.renderBrand());
+        if (this.actionProducts) {
+            div.appendChild(this.renderActions());
+        }
+        fadeable.appendChild(fullSizeItem);
+        this.root.appendChild(style);
+        this.root.appendChild(fadeable);
+    }
+    renderBrand() {
+        const itemBrand = document.createElement('div');
+        itemBrand.classList.add('item-brand');
+        itemBrand.classList.add(this.brand);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `/img/icons/brands.svg#${this.brand}`);
+        svg.appendChild(use);
+        itemBrand.appendChild(svg);
+        return itemBrand;
+    }
+    renderActions() {
+        const itemActions = document.createElement('div');
+        itemActions.classList.add('item-actions');
+        const specialLink = document.createElement('a');
+        specialLink.innerHTML = this.translationButtonSpecial;
+        if (this.externalLinkSpecial) {
+            specialLink.href = this.actionSpecial;
+            specialLink.target = '_blank';
+        }
+        else {
+            specialLink.href = this.langPrefix + this.actionSpecial;
+        }
+        const productsLink = document.createElement('a');
+        productsLink.innerHTML = this.translationButtonProducts;
+        if (this.externalLinkProducts) {
+            productsLink.href = this.actionProducts;
+            productsLink.target = '_blank';
+        }
+        else {
+            productsLink.href = this.langPrefix + this.actionProducts;
+        }
+        itemActions.appendChild(specialLink);
+        itemActions.appendChild(productsLink);
+        return itemActions;
+    }
+    renderImage() {
+        const picture = document.createElement('picture');
+        const mobileSrc = document.createElement('source');
+        mobileSrc.media = '(max-width: 1024px)';
+        mobileSrc.setAttribute('data-srcset', this.mobileSrc);
+        const desktopSrc = document.createElement('source');
+        desktopSrc.media = '(min-width: 1024px)';
+        desktopSrc.setAttribute('data-srcset', this.desktopSrc);
+        picture.appendChild(mobileSrc);
+        picture.appendChild(desktopSrc);
+        const fallback = document.createElement('img');
+        fallback.alt = this.brand;
+        fallback.setAttribute('data-src', this.desktopSrc);
+        picture.appendChild(fallback);
+        itemsObserver.addObservable(picture);
+        return picture;
+    }
+    renderVideo() {
+        const video = document.createElement('video');
+        video.src = this.getVideoSrc();
+        if (this.desktopPreview && this.mobilePreview) {
+            video.poster = this.getVideoPreview();
+        }
+        video.autoplay = false;
+        video.preload = 'none';
+        video.loop = true;
+        video.muted = true;
+        video.setAttribute('playsinline', 'true');
+        itemsObserver.addObservable(video);
+        return video;
+    }
+    getVideoSrc() {
+        if (screen.availWidth < 1024) {
+            return this.mobileSrc;
+        }
+        return this.desktopSrc;
+    }
+    getVideoPreview() {
+        if (screen.availWidth < 1024) {
+            return this.mobilePreview;
+        }
+        return this.desktopPreview;
+    }
+}
+window.customElements.define('banner-item', BannerItem);
+
+var styles$6 = ".background-image {\n  position: fixed;\n  top: 0;\n  z-index: 1000;\n  width: 100%;\n  height: 100%;\n  filter: blur(0.375rem);\n}\n\n.country-picker-container {\n  position: fixed;\n  top: 0;\n  z-index: 1000;\n  width: 100%;\n  height: 100%;\n}\n.country-picker-container .overlay {\n  width: 100%;\n  height: 100%;\n  background: rgba(85, 85, 85, 0.44);\n}\n.country-picker-container .country-picker {\n  font-family: \"Roboto\", Helvetica, Arial, sans-serif;\n  backdrop-filter: blur(0.375rem);\n  height: 100%;\n  padding: 4rem 2rem 1rem 2rem;\n  display: grid;\n  grid-template-areas: \"image\" \"selector\" \"button\" \"legal\";\n  grid-template-rows: max-content max-content max-content 1fr;\n  justify-items: center;\n}\n@media screen and (max-width: 1023px) {\n  .country-picker-container .country-picker.active {\n    grid-template-areas: \"selector\";\n    grid-template-rows: minmax(0, 1fr);\n  }\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker {\n    padding: 24.5vh 0 0;\n    grid-template-rows: max-content minmax(0, 1fr) max-content;\n    grid-template-columns: 1fr max-content max-content 1fr;\n    grid-column-gap: 1rem;\n    justify-content: center;\n    grid-template-areas: \"image image image image\" \". selector button .\" \"legal legal legal legal\";\n  }\n}\n.country-picker-container .country-picker .image-container {\n  grid-area: image;\n  margin-bottom: 4rem;\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .image-container {\n    margin-bottom: 2.5rem;\n  }\n}\n@media screen and (max-width: 1023px) {\n  .country-picker-container .country-picker .image-container.hide {\n    display: none;\n  }\n}\n.country-picker-container .country-picker .image-container svg {\n  width: 18rem;\n  fill: #e2001a;\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .image-container svg {\n    width: 23rem;\n  }\n}\n.country-picker-container .country-picker .item-selector-container {\n  grid-area: selector;\n  width: 100%;\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .item-selector-container {\n    width: 22.5rem;\n  }\n}\n.country-picker-container .country-picker .button-container {\n  grid-area: button;\n  width: 100%;\n  margin-top: 1rem;\n}\n@media screen and (max-width: 1023px) {\n  .country-picker-container .country-picker .button-container.hide {\n    display: none;\n  }\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .button-container {\n    margin-top: 0;\n  }\n}\n.country-picker-container .country-picker .button-container button {\n  width: 100%;\n  height: 3.375rem;\n  padding: 0;\n  background: white;\n  border: 1px solid #d6d6d6;\n  color: #333333;\n  cursor: pointer;\n  user-select: none;\n  outline: none;\n}\n.country-picker-container .country-picker .button-container button:hover {\n  color: #888888;\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .button-container button {\n    width: 4.5rem;\n  }\n}\n.country-picker-container .country-picker .legal-container {\n  display: flex;\n  width: 100%;\n  justify-content: flex-end;\n  align-items: flex-end;\n  grid-area: legal;\n}\n@media screen and (max-width: 1023px) {\n  .country-picker-container .country-picker .legal-container.hide {\n    display: none;\n  }\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .legal-container {\n    margin-top: 0;\n    margin-bottom: 1rem;\n    margin-right: 1rem;\n  }\n}\n.country-picker-container .country-picker .legal-container a {\n  font-size: 0.625rem;\n  line-height: 1.25rem;\n  font-weight: 300;\n  color: white;\n  text-decoration: none;\n  cursor: pointer;\n  margin-left: 1rem;\n}\n@media screen and (min-width: 1024px) {\n  .country-picker-container .country-picker .legal-container a {\n    font-size: 0.75rem;\n    letter-spacing: 0.0375rem;\n  }\n}";
+
+var styles$5 = ":host {\n  display: block;\n  height: 100%;\n}\n\n.item-selector {\n  user-select: none;\n  height: 100%;\n}\n.item-selector .selected-element {\n  background: white;\n  border: 1px solid #d6d6d6;\n  color: #333333;\n  box-sizing: border-box;\n  height: 3.375rem;\n  font-size: 0.75rem;\n  padding: 0 1.25rem;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  cursor: pointer;\n  outline: none;\n}\n.item-selector .selected-element:hover, .item-selector .selected-element:focus {\n  color: #888888;\n}\n.item-selector .selected-element > div {\n  pointer-events: none;\n}\n@media screen and (min-width: 1024px) {\n  .item-selector .selected-element {\n    font-size: 0.875rem;\n    line-height: 0.875rem;\n  }\n}\n.item-selector .selected-element svg {\n  width: 0.75rem;\n  height: 0.875rem;\n  fill: #888888;\n  pointer-events: none;\n}\n.item-selector .list {\n  height: calc(100% - 60px);\n  display: none;\n}\n.item-selector .list.active {\n  display: block;\n}";
+
+class ItemSelector extends HTMLElement {
+    constructor() {
+        super();
+        this.cs = getCountryService();
+        window.addEventListener('ny-countries-loaded', this.onCountriesLoaded.bind(this));
+        window.addEventListener('ny-country-selected', this.onCountrySelected.bind(this));
+    }
+    onCountriesLoaded(event) {
+        this.selectedCountry = this.currentCountry || event.detail.countries.find(c => c.ny_iso.toLowerCase() === this.cs.getCountryCodeFromLocation());
+        this.render();
+    }
+    onCountrySelected(event) {
+        this.selectedCountry = event.detail.country;
+        this.render();
+    }
+    onCountrySubscription(c) {
+        if (c) {
+            this.currentCountry = c;
+            this.selectedCountry = c;
+            this.render();
+        }
+    }
+    isActive() {
+        const list = this.root.querySelector('.item-selector .list');
+        return list.classList.contains('active');
+    }
+    setActive(state) {
+        const list = this.root.querySelector('.item-selector .list');
+        state ? list.classList.add('active') : list.classList.remove('active');
+    }
+    connectedCallback() {
+        this.root = this.attachShadow({ mode: 'open' });
+        const NY_COUNTRY_PICKER_ITEM_SELECTOR = 'NY_COUNTRY_PICKER_ITEM_SELECTOR';
+        this.cs.subscribeForCurrentCountry(NY_COUNTRY_PICKER_ITEM_SELECTOR, this.onCountrySubscription.bind(this));
+    }
+    disconnectedCallback() {
+        window.removeEventListener('ny-countries-loaded', this.onCountriesLoaded.bind(this));
+        window.removeEventListener('ny-country-selected', this.onCountrySelected.bind(this));
+    }
+    render() {
+        var _a, _b;
+        this.root.innerHTML = `
+    <style>${styles$5}</style>
+    <div class="item-selector">
+      <div class="selected-element" tabindex="-1">
+        <div>${(_a = this.selectedCountry) === null || _a === void 0 ? void 0 : _a.name} | ${(_b = this.selectedCountry) === null || _b === void 0 ? void 0 : _b.localized_name}</div>
+        <svg>
+          <use xlink:href="/img/icons/sprites.svg#chevron-down"/>
+        </svg>
+      </div>
+      <div class="list">
+        <slot></slot>
+      </div>
+    </div>
+    `;
+    }
+}
+window.customElements.define('item-selector', ItemSelector);
+
+class CountryPicker extends HTMLElement {
+    constructor() {
+        super();
+        this.cs = getCountryService();
+        this.addEventListener('click', this.onClick.bind(this));
+        window.addEventListener('ny-country-selected', this.onCountryClick.bind(this));
+        window.addEventListener('countrySwitcher:toggle', this.onToggleEvent.bind(this));
+        if (this.getUrlParam('disableCountrySwitcher')) {
+            this.render = () => { return; };
+            this.unrender = () => { return; };
+        }
+    }
+    onToggleEvent() {
+        this.active ? this.unrender() : this.render();
+    }
+    onClick(event) {
+        if (event.target instanceof HTMLAnchorElement) {
+            return;
+        }
+        if (event.target instanceof ItemSelector) {
+            this.itemSelector.isActive() ? this.itemSelector.setActive(false) : this.itemSelector.setActive(true);
+        }
+        else {
+            if (this.itemSelector.isActive()) {
+                this.itemSelector.setActive(false);
+            }
+        }
+        this.toggleElements();
+    }
+    toggleElements() {
+        var _a, _b;
+        (_a = this.querySelectorAll('.country-picker .toggleable')) === null || _a === void 0 ? void 0 : _a.forEach(elem => {
+            this.itemSelector.isActive() ? elem.classList.add('hide') : elem.classList.remove('hide');
+        });
+        (_b = this.querySelector('.country-picker')) === null || _b === void 0 ? void 0 : _b.classList.toggle('active');
+    }
+    onCountrySubscription(country) {
+        const countryCode = this.cs.getCountryCodeFromLocation();
+        if (country) {
+            this.currentCountry = country;
+        }
+        else {
+            if (countryCode === config.defaultLang) {
+                this.render();
+            }
+            else {
+                const byCountryCode = this.countries.find(c => c.ny_iso.toLowerCase() === countryCode.toLowerCase());
+                this.cs.setCurrentCountry(byCountryCode);
+            }
+        }
+    }
+    onCountryClick(event) {
+        var _a;
+        this.selectedCountry = event.detail.country;
+        (_a = this.itemSelector) === null || _a === void 0 ? void 0 : _a.setActive(false);
+    }
+    onSaveButtonClick() {
+        if (this.selectedCountry) {
+            this.cs.setCurrentCountry(this.selectedCountry);
+            this.cs.routeToCountry(this.selectedCountry.ny_iso.toLowerCase());
+        }
+        this.unrender();
+    }
+    render() {
+        const bodyElement = document.querySelector('#fashion');
+        bodyElement.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        this.active = true;
+        this.imageKey = this.getAttribute('imagekey') || this.imageKey;
+        this.mobileImageKey = this.getAttribute('mobileimagekey') || this.mobileImageKey;
+        this.innerHTML = `
+      <style>${styles$6}</style>
+      <style>
+        .background-image {
+            background: url(${this.imageKey}) no-repeat; background-size: cover;
+        }
+
+        @media screen and (max-width: 1024px) {
+          .background-image {
+            background: url(${this.mobileImageKey}) no-repeat; background-size: cover;
+          }
+        }
+
+      </style>
+      <div class="background-image"></div>
+      <div class="country-picker-container">
+        <div class="overlay">
+          <div class="country-picker">
+          <div class="image-container toggleable">
+            <svg>
+              <use xlink:href="/img/icons/sprites.svg#ny-logo"/>
+            </svg>
+          </div>
+          <div class="item-selector-container">
+            <item-selector>
+              <country-list></country-list>
+            </item-selector>
+          </div>
+          <div class="button-container toggleable">
+            <button>GO</button>
+          </div>
+          <div class="legal-container toggleable">
+            <a href="/legal/imprint?disableCountrySwitcher=true">Impressum</a>
+            <a href="/legal/privacy?disableCountrySwitcher=true">Datenschutz</a>
+          </div>
+        </div>
+        </div>
+      </div>`;
+        this.itemSelector = this.querySelector('.country-picker item-selector');
+        this.querySelector('.country-picker .button-container button').addEventListener('click', this.onSaveButtonClick.bind(this));
+    }
+    unrender() {
+        const bodyElement = document.querySelector('#fashion');
+        bodyElement.style.overflow = 'initial';
+        document.documentElement.style.overflow = 'initial';
+        this.active = false;
+        this.innerHTML = null;
+    }
+    getUrlParam(name, url) {
+        if (!url)
+            url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex.exec(url);
+        if (!results)
+            return null;
+        if (!results[2])
+            return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+    async connectedCallback() {
+        this.countries = await this.cs.getCountries();
+        this.selectedCountry = this.currentCountry || this.countries[0];
+        const NY_COUNTRY_PICKER = 'NY_COUNTRY_PICKER';
+        this.cs.subscribeForCurrentCountry(NY_COUNTRY_PICKER, this.onCountrySubscription.bind(this));
+    }
+    disconnectedCallback() {
+        this.removeEventListener('click', this.onClick.bind(this));
+        this.querySelector('.country-picker .button-container button').addEventListener('click', this.onSaveButtonClick.bind(this));
+        window.removeEventListener('ny-country-selected', this.onCountryClick.bind(this));
+        window.removeEventListener('countrySwitcher:toggle', this.onToggleEvent.bind(this));
+    }
+}
+window.customElements.define('country-picker', CountryPicker);
+
+var styles$4 = ".country-list {\n  font-family: Roboto, sans-serif;\n  height: 100%;\n  overflow-y: scroll;\n  background: white;\n  border: 1px solid #d6d6d6;\n  padding: 0.25rem 0;\n  scrollbar-width: none;\n  -webkit-overflow-scrolling: touch;\n}\n.country-list::-webkit-scrollbar {\n  display: none;\n}\n.country-list .country {\n  padding: 0.25rem 1.5rem;\n  font-size: 0.75rem;\n  cursor: pointer;\n  color: #333333;\n  display: flex;\n}\n@media screen and (min-width: 1024px) {\n  .country-list .country {\n    font-size: 0.875rem;\n  }\n}\n.country-list .country img {\n  width: 1rem;\n  height: 1rem;\n}\n.country-list .country:hover {\n  color: #888888;\n}\n.country-list .country:hover img {\n  filter: invert(54%) sepia(1%) saturate(0%) hue-rotate(6deg) brightness(99%) contrast(91%);\n}\n.country-list .country.active {\n  display: flex;\n  font-weight: 800;\n}\n@media screen and (min-width: 1024px) {\n  .country-list .country.active {\n    align-items: center;\n  }\n}\n.country-list .country.active img {\n  margin-left: 0.25rem;\n}\n.country-list .country:first-child {\n  padding-top: 1.5rem;\n}\n.country-list .country:last-child {\n  padding-bottom: 1.5rem;\n}\n@media screen and (max-width: 767px) {\n  .country-list .country:last-child {\n    padding-bottom: 3rem;\n  }\n}";
+
+class CountryList extends HTMLElement {
+    constructor() {
+        super();
+        this.cs = getCountryService();
+        this.countryClicked = this.countryClicked.bind(this);
+    }
+    static get observedAttributes() {
+        return ['currentcountry'];
+    }
+    countryClicked(c) {
+        this.emitCountrySelected(c);
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'currentcountry' && newValue !== this.currentCountryCode) {
+            this.currentCountryCode = newValue;
+            if (this.countries) {
+                this.render();
+            }
+        }
+    }
+    render() {
+        this.innerHTML = `
+    <style>${styles$4}</style>
+    <div class="country-list">
+      ${this.countries.map(c => this.renderCountry(c)).join(' ')}
+    </div>
+    `;
+        this.querySelectorAll('.country-list .country').forEach((ce, i) => ce.addEventListener('click', () => this.countryClicked(this.countries[i])));
+    }
+    renderCountry(country) {
+        if (this.currentCountryCode && this.currentCountryCode.toLowerCase() === country.iso_3166.toLowerCase()) {
+            return `
+      <div class="country active">
+        ${country.name} | ${country.localized_name} <img src="/img/icons/check.svg" alt="Checkmark" />
+      </div>
+    `;
+        }
+        return `
+      <div class="country">
+        ${country.name} | ${country.localized_name}
+      </div>
+    `;
+    }
+    emitCountrySelected(country) {
+        window.dispatchEvent(new CustomEvent("ny-country-selected", {
+            detail: {
+                country: country
+            }
+        }));
+    }
+    emitCountriesLoaded(countries) {
+        window.dispatchEvent(new CustomEvent("ny-countries-loaded", {
+            detail: {
+                countries: countries
+            }
+        }));
+    }
+    async connectedCallback() {
+        this.currentCountryCode = this.getAttribute('currentCountry') || this.currentCountryCode;
+        this.countries = (await this.cs.getCountries()).sort((a, b) => a.name.localeCompare(b.name));
+        this.emitCountriesLoaded(this.countries);
+        this.render();
+    }
+}
+window.customElements.define('country-list', CountryList);
+
+var styles$3 = ":host {\n  pointer-events: auto;\n}\n\n:host(.small) .hamburger-menu {\n  width: 1.25rem;\n  height: 1.25rem;\n}\n:host(.small) .hamburger-menu svg {\n  width: 1.25rem;\n  height: 1.25rem;\n}\n@media screen and (min-width: 1024px) {\n  :host(.small) .hamburger-menu {\n    padding: 0;\n    margin: 0 0.75rem 0 0;\n  }\n}\n@media screen and (min-width: 1024px) {\n  :host(.small) .hamburger-menu svg {\n    width: 1.25rem;\n  }\n}\n\n.hamburger-menu {\n  display: flex;\n  margin-left: 1rem;\n  margin-right: 0.75rem;\n  font-family: Roboto, Helvetica, Arial, sans-serif;\n  cursor: pointer;\n}\n.hamburger-menu svg {\n  width: 1.25rem;\n  height: 1.25rem;\n  fill: #333333;\n}\n@media screen and (min-width: 1024px) {\n  .hamburger-menu {\n    margin-left: 0;\n    margin: -1rem;\n    margin-right: 0;\n    padding: 1.5rem;\n  }\n  .hamburger-menu svg {\n    width: 2rem;\n    height: 1.75rem;\n  }\n  .hamburger-menu svg.light {\n    fill: white;\n  }\n  .hamburger-menu svg.dark {\n    fill: #333333;\n  }\n}";
+
+class Hamburger extends HTMLElement {
+    constructor() {
+        super();
+        this.onMenuOpened = this.onMenuOpened.bind(this);
+        this.openMenu = this.openMenu.bind(this);
+        this.closeMenu = this.closeMenu.bind(this);
+        this.isMenuVisible = this.isMenuVisible.bind(this);
+        this.onRequestThemeChange = this.onRequestThemeChange.bind(this);
+        window.addEventListener('ny-request-theme-change', this.onRequestThemeChange);
+        this.cgs = getCustomerGroupService();
+    }
+    connectedCallback() {
+        var _a;
+        this.querySelector('.gender-picker .item.women').addEventListener('click', () => this.cgs.setCustomerGroup('FEMALE'));
+        this.querySelector('.gender-picker .item.men').addEventListener('click', () => this.cgs.setCustomerGroup('MALE'));
+        this.setCustomerGroup();
+        this.root = this.attachShadow({ mode: 'open' });
+        window.addEventListener('ny-menu-opened', this.onMenuOpened);
+        this.menuVisible = false;
+        this.root.innerHTML =
+            `
+      <style>${styles$3}</style>
+      <div class="hamburger-menu">
+        <svg>
+            <use xlink:href="/img/icons/sprites.svg#hamburger"/>
+        </svg>
+      </div>
+      <slot></slot>
+      `;
+        this.root.querySelector('.hamburger-menu').addEventListener('click', this.openMenu);
+        (_a = this.querySelectorAll('hamburger-menu .is-sub-menu')) === null || _a === void 0 ? void 0 : _a.forEach(element => element.addEventListener('click', () => this.toggleSubMenu(element)));
+    }
+    disconnectedCallback() {
+        window.removeEventListener('ny-menu-opened', this.onMenuOpened);
+        window.removeEventListener('ny-request-theme-change', this.onRequestThemeChange);
+    }
+    toggleSubMenu(element) {
+        var _a;
+        element.classList.toggle('active');
+        (_a = element.querySelectorAll('.sub-menu-item')) === null || _a === void 0 ? void 0 : _a.forEach(it => it.classList.toggle('active'));
+    }
+    isMenuVisible() {
+        return this.menuVisible;
+    }
+    onMenuOpened(event) {
+        const menu = event.detail.menu;
+        if (!(menu instanceof Hamburger)) {
+            if (this.menuVisible) {
+                this.closeMenu();
+            }
+        }
+    }
+    setCustomerGroup() {
+        var _a, _b, _c, _d;
+        const customerGroup = this.getUrlParam('gender') || this.cgs.getCustomerGroup() || "FEMALE";
+        this.cgs.setCustomerGroup(customerGroup);
+        switch (customerGroup) {
+            case 'FEMALE':
+                (_a = this.querySelector(`.menu .gender-picker .item.men`)) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
+                (_b = this.querySelector(`.menu .gender-picker .item.women`)) === null || _b === void 0 ? void 0 : _b.classList.add('selected');
+                break;
+            case 'MALE':
+                (_c = this.querySelector(`.menu .gender-picker .item.women`)) === null || _c === void 0 ? void 0 : _c.classList.remove('selected');
+                (_d = this.querySelector(`.menu .gender-picker .item.men`)) === null || _d === void 0 ? void 0 : _d.classList.add('selected');
+                break;
+        }
+    }
+    getUrlParam(name, url) {
+        if (!url)
+            url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex.exec(url);
+        if (!results)
+            return null;
+        if (!results[2])
+            return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+    onRequestThemeChange(event) {
+        if (event.detail.caller instanceof Hamburger || event.detail.caller instanceof ThemeObserver || event.detail.caller instanceof Fader) {
+            this.oldTheme = this.currentTheme;
+            this.currentTheme = event.detail.theme;
+            if (this.currentTheme === Theme.RED) {
+                this.currentTheme = Theme.DARK;
+            }
+            if (event.detail.caller instanceof Fader) {
+                this.oldTheme = themeObserver.getCurrentTheme();
+                const menu = document.querySelector('hamburger-menu');
+                if (menu.isMenuVisible()) {
+                    return;
+                }
+                this.currentTheme = event.detail.theme;
+            }
+            if (event.detail.caller instanceof ThemeObserver) {
+                if (event.detail.tile === Tile.RIGHT) {
+                    this.oldTheme = this.currentTheme;
+                    this.currentTheme = Theme.DARK;
+                }
+            }
+            const svg = this.root.querySelector('.hamburger-menu svg');
+            svg.setAttribute('class', this.currentTheme);
+        }
+    }
+    openMenu() {
+        var _a, _b;
+        const hamburgerElement = this.root.querySelector('.hamburger-menu');
+        hamburgerElement.removeEventListener('click', this.openMenu);
+        hamburgerElement.addEventListener('click', this.closeMenu);
+        window.dispatchEvent(new CustomEvent("ny-menu-opened", { detail: { menu: this } }));
+        this.oldTheme = themeObserver.getCurrentTheme();
+        themeObserver.setTheme(this, Theme.RED);
+        this.menuVisible = true;
+        this.querySelector('.menu').classList.add('active');
+        hamburgerElement.classList.add('active');
+        this.querySelector('hamburger-menu .blur-backdrop').classList.add('active');
+        this.toggleSVG(this.menuVisible);
+        this.toggleScroll();
+        this.querySelector('.blur-backdrop').addEventListener('click', this.closeMenu);
+        this.wasHidden = (_a = document.querySelector('.fashion-header .logo')) === null || _a === void 0 ? void 0 : _a.classList.contains('hide');
+        if (this.wasHidden) {
+            (_b = document.querySelector('.fashion-header .logo')) === null || _b === void 0 ? void 0 : _b.classList.remove('hide');
+        }
+        window.addEventListener('ny-menu-closed', this.closeMenu);
+    }
+    closeMenu() {
+        var _a;
+        this.menuVisible = false;
+        themeObserver.setTheme(this, this.oldTheme);
+        this.querySelector('.menu').classList.remove('active');
+        const hamburgerElement = this.root.querySelector('.hamburger-menu');
+        hamburgerElement.classList.remove('active');
+        this.querySelector('hamburger-menu .blur-backdrop').classList.remove('active');
+        this.toggleSVG(this.menuVisible);
+        hamburgerElement.addEventListener('click', this.openMenu);
+        this.querySelector('.blur-backdrop').removeEventListener('click', this.closeMenu);
+        hamburgerElement.removeEventListener('click', this.closeMenu);
+        this.toggleScroll();
+        if (this.wasHidden) {
+            (_a = document.querySelector('.fashion-header .logo')) === null || _a === void 0 ? void 0 : _a.classList.add('hide');
+        }
+        window.removeEventListener('ny-menu-closed', this.closeMenu);
+    }
+    toggleSVG(state) {
+        const svg = this.root.querySelector('.hamburger-menu svg');
+        const use = this.root.querySelector('.hamburger-menu svg use');
+        if (state) {
+            svg.setAttribute('class', 'dark');
+            use.setAttribute('xlink:href', '/img/icons/sprites.svg#hamburger-close');
+        }
+        else {
+            svg.setAttribute('class', this.currentTheme);
+            use.setAttribute('xlink:href', '/img/icons/sprites.svg#hamburger');
+        }
+    }
+    toggleScroll() {
+        if (this.menuVisible) {
+            document.documentElement.style.overflow = 'hidden';
+        }
+        else {
+            document.documentElement.style.overflow = 'initial';
+        }
+    }
+}
+window.customElements.define('hamburger-menu', Hamburger);
+
+var styles$2 = ":host {\n  display: block;\n}\n:host * {\n  box-sizing: border-box;\n  font-family: Roboto, sans-serif;\n}\n\na,\nbutton {\n  cursor: pointer;\n  display: block;\n  text-decoration: none;\n  font-weight: 300;\n  color: #555555;\n  background: white;\n  border: none;\n  padding: 0;\n}\n\n:host(.sub-menu-item) {\n  display: none;\n}\n\n:host(.sub-menu-item.active) {\n  display: block;\n}\n\n:host(.item-group-1) a,\n:host(.item-group-1) button {\n  text-transform: uppercase;\n  font-size: 1rem;\n  line-height: 1.5rem;\n  margin-bottom: 0.75rem;\n}\n@media screen and (min-width: 1024px) {\n  :host(.item-group-1) a,\n:host(.item-group-1) button {\n    font-size: 1.25rem;\n    margin-bottom: 1.25rem;\n  }\n}\n@media screen and (min-width: 1024px) and (max-height: 900px) {\n  :host(.item-group-1) a,\n:host(.item-group-1) button {\n    margin-bottom: 0.75rem;\n  }\n}\n\n:host(.sub-menu-item.item-group-1) a,\n:host(.sub-menu-item.item-group-1) button {\n  margin-left: 1.25rem;\n  margin-bottom: 0;\n  margin-top: 0.375rem;\n  text-transform: none;\n}\n@media screen and (min-width: 1024px) {\n  :host(.sub-menu-item.item-group-1) a,\n:host(.sub-menu-item.item-group-1) button {\n    margin-top: 0.75rem;\n  }\n}\n\n:host(.item-group-2) a,\n:host(.item-group-2) button {\n  font-size: 0.875rem;\n  line-height: 0.875rem;\n  margin-bottom: 0.675rem;\n}\n@media screen and (min-width: 1024px) {\n  :host(.item-group-2) a,\n:host(.item-group-2) button {\n    font-size: 1rem;\n    margin-bottom: 0.3rem;\n    line-height: 1.25rem;\n  }\n}\n@media screen and (min-width: 1024px) and (max-height: 900px) {\n  :host(.item-group-2) a,\n:host(.item-group-2) button {\n    margin-bottom: 0.3rem;\n  }\n}\n\n:host(.sub-menu-item.item-group-2) a,\n:host(.sub-menu-item.item-group-2) button {\n  margin-left: 1.25rem;\n  margin-bottom: 0;\n  margin-top: 0.675rem;\n}\n@media screen and (min-width: 1024px) {\n  :host(.sub-menu-item.item-group-2) a,\n:host(.sub-menu-item.item-group-2) button {\n    margin-top: 0.375rem;\n  }\n}";
+
+let MenuItem = class MenuItem extends s {
+    connectedCallback() {
+        super.connectedCallback();
+        this.storedCustomerGroup = getCustomerGroupService().getCustomerGroup();
+        this.countryCode = getCountryService().getCountryCodeFromUrl();
+        // set default customer group
+        if (!this.storedCustomerGroup) {
+            this.storedCustomerGroup = 'FEMALE';
+        }
+        // set default target for external links
+        if (this.isExternal != "" && this.target == "") {
+            this.target = '_blank';
+        }
+        // add countryCode for internal links
+        if (!this.isExternal && this.countryCode !== "" && this.countryCode.toLowerCase() !== config.defaultLang) {
+            this.href = `/${this.countryCode}${this.href}`;
+        }
+    }
+    dispatch() {
+        window.dispatchEvent(new Event(this.event));
+    }
+    render() {
+        if (this.storedCustomerGroup !== "" && this.customerGroup !== "" && this.storedCustomerGroup !== this.customerGroup) {
+            return null;
+        }
+        if (this.event) {
+            return p `
+      <style>${styles$2}</style>
+      <button @click="${this.dispatch}"><slot></slot></button>
+    `;
+        }
+        return p `
+      <style>${styles$2}</style>
+      <a href="${this.href}" target="${this.target}"><slot></slot></a>
+    `;
+    }
+};
+__decorate([
+    e()
+], MenuItem.prototype, "customerGroup", void 0);
+__decorate([
+    e()
+], MenuItem.prototype, "href", void 0);
+__decorate([
+    e()
+], MenuItem.prototype, "event", void 0);
+__decorate([
+    e()
+], MenuItem.prototype, "target", void 0);
+__decorate([
+    e()
+], MenuItem.prototype, "isExternal", void 0);
+__decorate([
+    t()
+], MenuItem.prototype, "storedCustomerGroup", void 0);
+__decorate([
+    t()
+], MenuItem.prototype, "countryCode", void 0);
+MenuItem = __decorate([
+    n('menu-item')
+], MenuItem);
+
+var styles$1 = ":host {\n  pointer-events: auto;\n}\n\n:host-context(.logo.hide) {\n  pointer-events: none;\n}\n\n@media screen and (min-width: 1024px) {\n  :host(.small) .logo {\n    width: 6.5rem;\n  }\n}\n\n.logo {\n  width: 6.5rem;\n  height: 1.5rem;\n  fill: #e2001a;\n}\n@media screen and (min-width: 1024px) {\n  .logo {\n    width: 13rem;\n    height: 3rem;\n  }\n  .logo.light {\n    fill: white;\n  }\n  .logo.dark {\n    fill: #333333;\n  }\n  .logo.red {\n    fill: #e2001a;\n  }\n}";
+
+let Logo = class Logo extends s {
+    constructor() {
+        super();
+        this.currentTheme = Theme.RED;
+        this.onRequestThemeChange = this.onRequestThemeChange.bind(this);
+        window.addEventListener('ny-request-theme-change', this.onRequestThemeChange);
+        this.countryService = getCountryService();
+        this.cgs = getCustomerGroupService();
+    }
+    connectedCallback() {
+        super.connectedCallback();
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener('ny-request-theme-change', this.onRequestThemeChange);
+    }
+    onRequestThemeChange(event) {
+        const menu = document.querySelector('hamburger-menu');
+        if (menu.isMenuVisible()) {
+            return;
+        }
+        this.currentTheme = event.detail.theme;
+        if (event.detail.caller instanceof ThemeObserver) {
+            if (event.detail.tile === Tile.RIGHT) {
+                this.currentTheme = Theme.DARK;
+            }
+        }
+    }
+    firstUpdated(_changedProperties) {
+        super.firstUpdated(_changedProperties);
+        themeObserver.initObservables();
+    }
+    render() {
+        const customerGroup = this.cgs.getCustomerGroup();
+        this.countryCode = this.countryService.getCountryCodeFromLocation();
+        let gender = 'women';
+        if (customerGroup === 'MALE') {
+            gender = 'men';
+        }
+        let href = gender;
+        if (this.countryCode !== 'de') {
+            href = `${this.countryCode}/${gender}`;
+        }
+        return p `
+        <style>${styles$1}</style>
+        <a href="/${href}/">
+        <svg class="logo ${this.currentTheme}">
+            <use xlink:href="/img/icons/sprites.svg#ny-logo"
+        </svg>
+        </a>
+        `;
+    }
+};
+__decorate([
+    t()
+], Logo.prototype, "currentTheme", void 0);
+__decorate([
+    t()
+], Logo.prototype, "themedElements", void 0);
+__decorate([
+    t()
+], Logo.prototype, "countryCode", void 0);
+__decorate([
+    t()
+], Logo.prototype, "countryService", void 0);
+__decorate([
+    t()
+], Logo.prototype, "cgs", void 0);
+Logo = __decorate([
+    n('ny-logo')
+], Logo);
+
+var style = ":host {\n  position: relative;\n  margin-left: 0.75rem;\n  pointer-events: auto;\n}\n\n:host-context(.logo.hide) {\n  pointer-events: none;\n}\n\n@media screen and (min-width: 1024px) {\n  :host(.small) .country-switcher {\n    font-size: 1rem;\n    margin-top: 0.1rem;\n  }\n}\n@media screen and (min-width: 1024px) {\n  :host(.small) .country-switcher img {\n    width: 1rem;\n    height: 1rem;\n    margin-top: -0.1rem;\n  }\n}\n\n.closable-overlay {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  z-index: -1;\n  top: 0;\n  left: 0;\n}\n\n.country-switcher {\n  font-family: \"Roboto\", \"Open Sans\", Helvetica, Arial, sans-serif;\n  font-weight: 500;\n  margin-right: 1rem;\n  cursor: pointer;\n  font-size: 0.9375rem;\n  width: 1.125rem;\n  height: 1.125rem;\n  color: #333333;\n  display: flex;\n  align-items: center;\n}\n@media screen and (min-width: 1024px) {\n  .country-switcher {\n    margin-right: 0;\n    font-size: 1.25rem;\n    width: 1.5rem;\n    height: 1.5rem;\n  }\n  .country-switcher.dark {\n    color: #333333;\n  }\n  .country-switcher.light {\n    color: white;\n  }\n  .country-switcher.red {\n    color: #e2001a;\n  }\n}\n.country-switcher img {\n  width: 1.125rem;\n  height: 1.125rem;\n  filter: invert(54%) sepia(1%) saturate(0%) hue-rotate(6deg) brightness(99%) contrast(91%);\n}\n@media screen and (min-width: 1024px) {\n  .country-switcher img {\n    width: 1.5rem;\n    height: 1.5rem;\n  }\n}\n\n.country-menu {\n  position: fixed;\n  top: 54px;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background: white;\n  z-index: -1;\n}\n@media screen and (max-width: 1023px) {\n  .country-menu {\n    transition: all 350ms ease-out;\n    transform: translateX(100%);\n  }\n}\n@media screen and (min-width: 1024px) {\n  .country-menu {\n    display: none;\n    position: absolute;\n    top: 2rem;\n    width: auto;\n    height: auto;\n    left: unset;\n    right: calc(100% - 1.5rem);\n  }\n}\n@media screen and (max-width: 1023px) {\n  .country-menu.active {\n    transform: translateX(0);\n  }\n}\n@media screen and (min-width: 1024px) {\n  .country-menu.active {\n    display: block;\n  }\n}\n.country-menu .country-list {\n  max-height: 100vh;\n  border: none;\n}\n@media screen and (min-width: 1024px) {\n  .country-menu .country-list {\n    white-space: nowrap;\n    max-height: 50vh;\n  }\n}\n.country-menu .country-list .country:first-child {\n  padding-top: 2rem;\n}\n.country-menu .country-list .country:last-child {\n  padding-bottom: 8rem;\n}\n@media screen and (min-width: 1024px) {\n  .country-menu .country-list .country {\n    font-size: 1rem;\n    font-weight: 300;\n  }\n  .country-menu .country-list .country:last-child {\n    padding-bottom: 0.875rem;\n  }\n}";
+
+var CountrySwitcher_1;
+let CountrySwitcher = CountrySwitcher_1 = class CountrySwitcher extends s {
+    constructor() {
+        super();
+        this.menuVisible = false;
+        this.cs = getCountryService();
+        this.onCountrySelected = this.onCountrySelected.bind(this);
+        this.onMenuOpened = this.onMenuOpened.bind(this);
+        this.onRequestThemeChange = this.onRequestThemeChange.bind(this);
+        window.addEventListener('ny-request-theme-change', this.onRequestThemeChange);
+    }
+    connectedCallback() {
+        window.addEventListener('ny-menu-opened', this.onMenuOpened);
+        super.connectedCallback();
+        this.cs.subscribeForCurrentCountry('NY-COUNTRY-SWITCHER', c => this.onCountrySubscription(c));
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener('ny-menu-opened', this.onMenuOpened);
+        window.removeEventListener('ny-request-theme-change', this.onRequestThemeChange);
+    }
+    onMenuOpened(event) {
+        const menu = event.detail.menu;
+        if (!(menu instanceof CountrySwitcher_1) && this.menuVisible) {
+            this.closeMenu();
+        }
+    }
+    onRequestThemeChange(event) {
+        if (event.detail.caller instanceof ThemeObserver || event.detail.caller instanceof CountrySwitcher_1 || event.detail.caller instanceof Fader) {
+            this.currentTheme = event.detail.theme;
+            if (event.detail.caller instanceof ThemeObserver) {
+                if (event.detail.tile === Tile.LEFT) {
+                    this.currentTheme = Theme.DARK;
+                }
+            }
+        }
+    }
+    onCountrySubscription(c) {
+        this.currentCountry = c;
+    }
+    onCountrySelected(event) {
+        const c = event.detail.country;
+        const countryCode = this.cs.getCountryCodeFromLocation();
+        if (c.ny_iso.toLowerCase() !== countryCode.toLowerCase()) {
+            this.cs.setCurrentCountry(c);
+            this.cs.routeToCountry(c.ny_iso.toLowerCase());
+        }
+        this.currentCountry = c;
+        this.closeMenu();
+    }
+    async onCountryClick() {
+        if (!this.menuVisible) {
+            window.dispatchEvent(new CustomEvent("ny-menu-opened", {
+                detail: {
+                    menu: this
+                }
+            }));
+        }
+        this.menuVisible = !this.menuVisible;
+        this.toggleScroll();
+        if (this.menuVisible) {
+            window.addEventListener('ny-country-selected', this.onCountrySelected);
+        }
+        else {
+            window.removeEventListener('ny-country-selected', this.onCountrySelected);
+        }
+    }
+    closeMenu() {
+        this.menuVisible = false;
+        this.toggleScroll();
+    }
+    render() {
+        var _a, _b;
+        return p `
+    <style>${style}</style>
+    ${this.menuVisible ? p `<div class="closable-overlay" @click="${this.closeMenu}"></div>` : null}
+    <div class="country-switcher ${this.currentTheme}" @click="${this.onCountryClick}">
+      ${this.menuVisible ? p `<img src="/img/icons/times-circle.svg" alt="Country Switcher Close"/>` : this.currentCountry ? (_a = this.currentCountry) === null || _a === void 0 ? void 0 : _a.iso_3166 : 'DE'}
+    </div>
+    <div class="country-menu ${this.menuVisible ? 'active' : ''}">
+      <country-list currentCountry="${(_b = this.currentCountry) === null || _b === void 0 ? void 0 : _b.iso_3166}"></country-list>
+    </div>
+    `;
+    }
+    toggleScroll() {
+        if (this.menuVisible) {
+            document.documentElement.style.overflow = 'hidden';
+        }
+        else {
+            document.documentElement.style.overflow = 'initial';
+        }
+    }
+};
+__decorate([
+    t()
+], CountrySwitcher.prototype, "cs", void 0);
+__decorate([
+    t()
+], CountrySwitcher.prototype, "currentCountry", void 0);
+__decorate([
+    t()
+], CountrySwitcher.prototype, "menuVisible", void 0);
+__decorate([
+    t()
+], CountrySwitcher.prototype, "currentTheme", void 0);
+CountrySwitcher = CountrySwitcher_1 = __decorate([
+    n('country-switcher')
+], CountrySwitcher);
+
+var styles = ":host {\n  margin-right: 0.75rem;\n  position: relative;\n  pointer-events: auto;\n}\n:host * {\n  font-family: Roboto, Helvetica, Arial, sans-serif;\n  box-sizing: border-box;\n}\n\n:host-context(.logo.hide) {\n  pointer-events: none;\n}\n\n@media screen and (min-width: 1024px) {\n  :host(.small) .customer-widget svg {\n    width: 1rem;\n    height: 1rem;\n  }\n}\n\n.closable-overlay {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  z-index: -1;\n  top: 0;\n  left: 0;\n}\n\n.customer-widget {\n  cursor: pointer;\n}\n.customer-widget svg {\n  width: 1.125rem;\n  height: 1.125rem;\n  display: block;\n}\n.customer-widget svg.red {\n  fill: #e2001a;\n}\n.customer-widget svg.grey {\n  fill: #888888;\n}\n@media screen and (min-width: 1024px) {\n  .customer-widget svg {\n    width: 1.5rem;\n    height: 1.5rem;\n  }\n  .customer-widget svg.light {\n    fill: white;\n  }\n  .customer-widget svg.dark {\n    fill: #333333;\n  }\n}\n\n.customer-menu {\n  position: fixed;\n  top: 54px;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  background: white;\n  z-index: -1;\n}\n.customer-menu.no-login {\n  padding: 1.5rem;\n}\n@media screen and (max-width: 1023px) {\n  .customer-menu {\n    transition: all 350ms ease-out;\n    transform: translateX(100%);\n  }\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu {\n    display: none;\n    position: absolute;\n    top: 2rem;\n    width: 21rem;\n    height: auto;\n    left: unset;\n    right: calc(100% - 2rem);\n  }\n}\n@media screen and (max-width: 1023px) {\n  .customer-menu.active {\n    transform: translateX(0);\n  }\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu.active {\n    display: block;\n    border: #e3e3e3 solid 1px;\n  }\n}\n.customer-menu .menu-items {\n  display: flex;\n  flex-direction: column;\n  margin: 2rem;\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu .menu-items {\n    white-space: nowrap;\n    padding-right: 2.5rem;\n  }\n}\n.customer-menu .menu-items a, .customer-menu .menu-items button {\n  width: 100%;\n  text-decoration: none;\n  margin-bottom: 2rem;\n  display: inherit;\n  border: none;\n  outline: none;\n  background: white;\n  cursor: pointer;\n  font-weight: 300;\n  padding: 0;\n}\n.customer-menu .menu-items a:last-child, .customer-menu .menu-items button:last-child {\n  margin-bottom: 0;\n}\n.customer-menu .menu-items a img, .customer-menu .menu-items button img {\n  width: 1.25rem;\n  height: 1.25rem;\n  filter: invert(30%) sepia(10%) saturate(0%) hue-rotate(197deg) brightness(97%) contrast(84%);\n}\n.customer-menu .menu-items a span, .customer-menu .menu-items button span {\n  font-size: 0.875rem;\n  color: #555555;\n  text-transform: uppercase;\n  margin-left: 1rem;\n}\n.customer-menu .email-spacer {\n  padding: 2.25rem 2rem 1.5rem;\n  color: #888888;\n  border-bottom: 1px solid #d6d6d6;\n  margin-left: 1rem;\n  margin-right: 1rem;\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu .email-spacer {\n    margin-left: 0;\n    margin-right: 0;\n  }\n}\n.customer-menu .error-container {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  width: 100%;\n  margin-bottom: 1.5rem;\n  visibility: hidden;\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu .error-container {\n    visibility: unset;\n    display: none;\n  }\n}\n.customer-menu .error-container.has-error {\n  visibility: visible;\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu .error-container.has-error {\n    visibility: unset;\n    display: flex;\n  }\n}\n.customer-menu .error-container .error-icon {\n  margin-bottom: 0.75rem;\n}\n.customer-menu .error-container .error-icon img {\n  filter: invert(22%) sepia(56%) saturate(1478%) hue-rotate(187deg) brightness(99%) contrast(90%);\n  width: 1.5rem;\n  height: 1.5rem;\n}\n.customer-menu .error-container .error-text {\n  color: #1d508d;\n  font-size: 0.875rem;\n  text-align: center;\n  line-height: 1.25rem;\n  margin: 0 -1rem;\n}\n.customer-menu .email-input {\n  width: 100%;\n  height: 2.5rem;\n  margin-bottom: 0.75rem;\n}\n.customer-menu .email-input input {\n  width: 100%;\n  height: 100%;\n  padding: 0.75rem;\n  outline: none;\n  color: #555555;\n}\n.customer-menu .email-input input:focus {\n  border: 1px solid #888888;\n}\n.customer-menu .email-input input::placeholder {\n  color: #888888;\n}\n.customer-menu .email-input input:placeholder-shown {\n  border: 1px solid #d6d6d6;\n}\n.customer-menu .email-input input:placeholder-shown:focus {\n  border: 1px solid #888888;\n}\n.customer-menu .password-input {\n  width: 100%;\n  height: 2.5rem;\n}\n.customer-menu .password-input input {\n  width: 100%;\n  height: 100%;\n  padding: 0.75rem;\n  outline: none;\n  color: #555555;\n}\n.customer-menu .password-input input:focus {\n  border: 1px solid #888888;\n}\n.customer-menu .password-input input::placeholder {\n  color: #888888;\n}\n.customer-menu .password-input input:placeholder-shown {\n  border: 1px solid #d6d6d6;\n}\n.customer-menu .password-input input:placeholder-shown:focus {\n  border: 1px solid #888888;\n}\n.customer-menu .password-reset {\n  text-align: right;\n}\n.customer-menu .password-reset a {\n  font-size: 0.75rem;\n  font-weight: 300;\n  text-decoration: none;\n  color: #888888;\n  cursor: pointer;\n}\n.customer-menu .stay-logged-reset-password-container {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n.customer-menu .stay-logged-reset-password-container .save-login {\n  display: flex;\n}\n.customer-menu .stay-logged-reset-password-container #customer-widget-checkbox {\n  cursor: pointer;\n  margin: 0;\n}\n.customer-menu .stay-logged-reset-password-container .customer-widget-checkbox-label {\n  text-transform: none;\n  background-color: transparent;\n  letter-spacing: normal;\n  font-size: 0.75rem;\n  color: #888888;\n  font-weight: 300;\n  padding: 0;\n}\n.customer-menu .stay-logged-reset-password-container .customer-widget-checkbox-label:hover {\n  color: #555555;\n  cursor: pointer;\n}\n.customer-menu input[type=checkbox] {\n  width: 0;\n  height: 0;\n  margin: 0;\n}\n.customer-menu input[type=checkbox] + label {\n  position: relative;\n  overflow: hidden;\n  cursor: pointer;\n}\n.customer-menu input[type=checkbox] + label::before {\n  content: \"\";\n  display: inline-flex;\n  background-color: white;\n  border: 0.0625rem solid #888888;\n  border-radius: 0.125rem;\n  margin-right: 0.5rem;\n  height: 0.625rem;\n  width: 0.625rem;\n}\n.customer-menu input[type=checkbox]:checked + label::after {\n  content: \"\";\n  position: absolute;\n  width: 0.4375rem;\n  height: 0.125rem;\n  background: rgba(85, 85, 85, 0);\n  top: 0.25rem;\n  left: 0.125rem;\n  border: 0.125rem solid #555555;\n  border-top: none;\n  border-right: none;\n  transform: rotate(-45deg);\n}\n.customer-menu .buttons {\n  margin-top: 4rem;\n  display: flex;\n  flex-direction: row;\n  justify-content: flex-end;\n  align-items: center;\n}\n@media screen and (min-width: 1024px) {\n  .customer-menu .buttons {\n    margin-top: 2.5rem;\n  }\n}\n.customer-menu .buttons a {\n  margin-right: 0.5rem;\n  color: #888888;\n  text-decoration: none;\n  text-transform: uppercase;\n  font-size: 0.875rem;\n  text-align: center;\n  font-weight: 300;\n  line-height: 0.75rem;\n  letter-spacing: 0.7px;\n}\n.customer-menu .buttons button {\n  margin-left: 0.5rem;\n  color: white;\n  border-radius: 5px;\n  background: #e2001a;\n  padding: 0.75rem 1.5rem;\n  border: none;\n  outline: none;\n  text-transform: uppercase;\n  font-size: 0.875rem;\n  text-align: center;\n  font-weight: 300;\n  line-height: 0.75rem;\n  letter-spacing: 0.7px;\n  cursor: pointer;\n}\n.customer-menu .buttons button.disabled {\n  background: #d6d6d6;\n  color: #888888;\n  cursor: not-allowed;\n}";
+
+var CustomerWidget_1;
+let CustomerWidget = CustomerWidget_1 = class CustomerWidget extends s {
+    constructor() {
+        super();
+        this.currentCustomer = null;
+        this.isLoggedIn = !!this.currentCustomer;
+        this.menuVisible = false;
+        this.hasError = false;
+        this.email = '';
+        this.password = '';
+        this.currentTheme = Theme.DARK;
+        this.saveLogin = false;
+        this.customerService = CustomerService.get();
+        this.cgs = getCustomerGroupService();
+        this.translationService = getTranslationService();
+        this.countryService = getCountryService();
+        this.onCustomerSubscription = this.onCustomerSubscription.bind(this);
+        this.onMenuOpened = this.onMenuOpened.bind(this);
+        this.onRequestThemeChange = this.onRequestThemeChange.bind(this);
+        this.handleCustomLikesEvent = this.handleCustomLikesEvent.bind(this);
+        window.addEventListener('ny-request-theme-change', this.onRequestThemeChange);
+        this.customerService.subscribeForCustomer('NY-CUSTOMER-WIDGET', this.onCustomerSubscription);
+    }
+    async connectedCallback() {
+        this.translator = await this.translationService.initTranslations('208671', this.countryService.getCountryCodeFromLocation());
+        this.countryCode = this.getAttribute('countryCode') || '';
+        window.addEventListener('ny-menu-opened', this.onMenuOpened);
+        super.connectedCallback();
+    }
+    disconnectedCallback() {
+        window.removeEventListener('ny-menu-opened', this.onMenuOpened);
+        window.removeEventListener('ny-request-theme-change', this.onRequestThemeChange);
+        super.disconnectedCallback();
+    }
+    onMenuOpened(event) {
+        const menu = event.detail.menu;
+        if (!(menu instanceof CustomerWidget_1) && this.menuVisible) {
+            this.closeMenu();
+        }
+    }
+    onRequestThemeChange(event) {
+        if (event.detail.caller instanceof ThemeObserver || event.detail.caller instanceof CustomerWidget_1 || event.detail.caller instanceof Fader) {
+            this.currentTheme = event.detail.theme;
+            if (event.detail.caller instanceof ThemeObserver) {
+                if (event.detail.tile === Tile.LEFT) {
+                    this.currentTheme = Theme.DARK;
+                }
+            }
+            document.querySelector('.separator').setAttribute('class', `separator ${this.currentTheme}`);
+        }
+    }
+    onCustomerSubscription(c) {
+        this.currentCustomer = c;
+        this.isLoggedIn = !!this.currentCustomer;
+    }
+    onWidgetClick() {
+        if (!this.menuVisible) {
+            window.dispatchEvent(new CustomEvent("ny-menu-opened", { detail: { menu: this } }));
+        }
+        this.menuVisible = !this.menuVisible;
+        this.toggleScroll();
+    }
+    handleCustomLikesEvent() {
+        window.dispatchEvent(new CustomEvent("ny-products-client", { detail: { route: 'FAVORITES' } }));
+        this.closeMenu();
+    }
+    toggleScroll() {
+        if (this.menuVisible) {
+            document.documentElement.style.overflow = 'hidden';
+        }
+        else {
+            document.documentElement.style.overflow = 'initial';
+        }
+    }
+    onEmailChanged(e) {
+        this.email = e.target.value;
+    }
+    onPasswordChanged(e) {
+        this.password = e.target.value;
+    }
+    onSaveLoginChanged(e) {
+        this.saveLogin = e.target.checked;
+    }
+    resetForm() {
+        this.email = '';
+        this.password = '';
+    }
+    async handleEnterPressed(e) {
+        if (e.key === 'Enter') {
+            await this.login(this.email, this.password, this.saveLogin);
+        }
+    }
+    async login(email, password, permanent) {
+        this.hasError = false;
+        try {
+            await this.customerService.login(this.email, this.password, permanent);
+            this.closeMenu();
+            this.resetForm();
+        }
+        catch (e) {
+            this.hasError = true;
+        }
+    }
+    async logout() {
+        this.hasError = false;
+        try {
+            await this.customerService.logout();
+            this.closeMenu();
+            this.resetForm();
+        }
+        catch (e) {
+            this.hasError = true;
+        }
+    }
+    closeMenu() {
+        this.menuVisible = false;
+        this.toggleScroll();
+    }
+    render() {
+        if (this.isLoggedIn) {
+            return p `
+        <style>${styles}</style>
+        ${this.menuVisible ? p `
+          <div class="closable-overlay" @click="${this.closeMenu}"></div>` : null}
+        <div class="customer-widget" @click="${this.onWidgetClick}">
+          ${this.menuVisible ? p `
+            <svg class="grey">
+              <use xlink:href="/img/icons/sprites.svg#times-circle"/>
+            </svg>` : p `
+            <svg class="red">
+              <use xlink:href="/img/icons/sprites.svg#user-filled"/>
+            </svg>`}
+        </div>
+        <div class="customer-menu ${this.menuVisible ? 'active' : ''}">
+          <div class="email-spacer">
+            <span>${this.currentCustomer.email}</span>
+          </div>
+          <div class="menu-items">
+            <a href="${this.countryCode}/customer-profile/#/private/customer-profile/change-user-data">
+              <img src="/img/icons/menu-profile.svg" alt="${this.translator.translate('widget.menu.profile')}"/>
+              <span>${this.translator.translate('widget.menu.profile')}</span>
+            </a>
+            ${this.countryService.getCountryCodeFromLocation() === 'de' ?
+                p `<a href="${this.countryCode}/get-more-club/">
+                <img src="/img/icons/menu-get-more.svg"
+                     alt="${this.translator.translate('widget.menu.get-more-club')}"/>
+                <span>${this.translator.translate('widget.menu.get-more-club')}</span>
+              </a>` : null}
+            <a href="${this.countryCode}/products/#/?gender=${this.cgs.getCustomerGroup()}&likes=like"
+               @click="${this.handleCustomLikesEvent}">
+              <img src="/img/icons/menu-favorites.svg" alt="${this.translator.translate('widget.menu.favorites')}"/>
+              <span>${this.translator.translate('widget.menu.favorites')}</span>
+            </a>
+            <button @click="${this.logout}">
+              <img src="/img/icons/menu-logout.svg" alt="${this.translator.translate('widget.menu.logout')}"/>
+              <span>${this.translator.translate('widget.menu.logout')}</span>
+            </button>
+          </div>
+        </div>
+      `;
+        }
+        else {
+            return p `
+        <style>${styles}</style>
+        ${this.menuVisible ? p `
+          <div class="closable-overlay" @click="${this.closeMenu}"></div>` : null}
+        <div class="customer-widget" @click="${this.onWidgetClick}">
+          ${this.menuVisible ? p `
+            <svg class="grey">
+              <use xlink:href="/img/icons/sprites.svg#times-circle"/>
+            </svg>` : p `
+            <svg class="${this.currentTheme}">
+              <use xlink:href="/img/icons/sprites.svg#user-circle"/>
+            </svg>`}
+        </div>
+        <div class="customer-menu no-login ${this.menuVisible ? 'active' : ''}">
+          <div class="error-container ${this.hasError ? 'has-error' : ''}">
+            <div class="error-icon">
+              <img src="/img/icons/exclamation-circle.svg" alt="Error Icon"/>
+            </div>
+            <div class="error-text">
+              ${this.translator.translate('widget.login.error')}
+            </div>
+          </div>
+
+          <div class="email-input">
+            <input type="email" value="${this.email}" @input="${this.onEmailChanged}"
+                   @keyup="${this.handleEnterPressed}"
+                   placeholder="${this.translator.translate('widget.login.placeholder.email')}">
+          </div>
+          <div class="password-input">
+            <input type="password" value="${this.password}" @input="${this.onPasswordChanged}"
+                   @keyup="${this.handleEnterPressed}"
+                   placeholder="${this.translator.translate('widget.login.placeholder.password')}">
+          </div>
+          <div class="stay-logged-reset-password-container">
+            <div class="save-login">
+                <input @click="${this.onSaveLoginChanged}" id="customer-widget-checkbox" name="customer-widget-checkbox" type="checkbox"/>
+                <label class="customer-widget-checkbox-label" for="customer-widget-checkbox">${this.translator.translate('widget.login.save-login')}</label>
+            </div>
+            <div class="password-reset">
+                <a href="${this.countryCode}/customer-profile/#/public/customer-profile/reset-password/${this.email && `?email=${this.email}`}">${this.translator.translate('widget.login.button.password-reset')}</a>
+            </div>
+          </div>
+          <div class="buttons">
+            ${this.countryService.getCountryCodeFromLocation() === 'de' ?
+                p `<a class="button-register"
+                      href="/get-more-club/#/register">${this.translator.translate('widget.login.button.register')}</a>` :
+                p `<a class="button-register"
+                      href="${this.countryCode}/customer-profile/#/public/customer-profile/register-user/customer-profile/noData">${this.translator.translate('widget.login.button.register')}</a>`}
+            <button class="button-login ${!(this.email && this.password) ? 'disabled' : ''}"
+                    @click="${() => this.login(this.email, this.password, this.saveLogin)}">
+              ${this.translator.translate('widget.login.button.login')}
+            </button>
+          </div>
+        </div>
+      `;
+        }
+    }
+};
+__decorate([
+    t()
+], CustomerWidget.prototype, "customerService", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "currentCustomer", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "isLoggedIn", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "menuVisible", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "hasError", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "email", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "password", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "translator", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "currentTheme", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "cgs", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "translationService", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "countryService", void 0);
+__decorate([
+    t()
+], CustomerWidget.prototype, "saveLogin", void 0);
+__decorate([
+    e()
+], CustomerWidget.prototype, "countryCode", void 0);
+CustomerWidget = CustomerWidget_1 = __decorate([
+    n('customer-widget')
+], CustomerWidget);
+//# sourceMappingURL=fashion-5568f1c4.js.map

@@ -1,0 +1,668 @@
+import { _ as __decorate } from './vendor-128e1c8c.js';
+import { e, t, n, s, p, o } from './lit-element-b02881dc.js';
+import { h as getTranslationService, g as getCountryService, f as getCustomerService, i as RegisterData, c as config } from './country-service-7afd87f9.js';
+import { P as Participation, g as getCompetitionService } from './competition-service-292753e9.js';
+import { D, F, l, s as s$1, y, e as e$1, d, r as register, p as p$1 } from './preact-2bb0e238.js';
+import { g as getCustomerGroupService } from './customer-group-5a35cbad.js';
+
+var styles$3 = ":host {\n  display: block;\n}\n:host * {\n  font-family: Roboto, sans-serif;\n  box-sizing: border-box;\n}\n\n.competition-widget .title {\n  text-align: center;\n}\n.competition-widget .competition-invalid {\n  text-align: center;\n  font-size: 1.5rem;\n  font-weight: 400;\n}\n.competition-widget .email-container {\n  display: flex;\n  align-items: baseline;\n}\n.competition-widget .email-container label {\n  display: none;\n  font-size: 1.125rem;\n  line-height: 1.125rem;\n  font-weight: 300;\n  color: #333333;\n  margin-right: 1.5rem;\n  white-space: nowrap;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget .email-container label {\n    display: block;\n  }\n}\n@media screen and (min-width: 1024px) and (max-width: 1215px) {\n  .competition-widget .email-container label {\n    display: none;\n  }\n}\n.competition-widget input[type=email],\n.competition-widget textarea {\n  width: 100%;\n  font-size: 0.875rem;\n  line-height: 1.125rem;\n  font-weight: 300;\n  padding: 0.75rem 0.75rem 0.75rem;\n  outline: none;\n  color: #555555;\n  border: 1px solid #888888;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget input[type=email],\n.competition-widget textarea {\n    font-size: 1.125rem;\n    line-height: 1.125rem;\n  }\n}\n.competition-widget input[type=email]::placeholder,\n.competition-widget textarea::placeholder {\n  color: #b2b2b2;\n}\n.competition-widget input[type=email]:placeholder-shown,\n.competition-widget textarea:placeholder-shown {\n  border: 1px solid #d6d6d6;\n}\n.competition-widget input {\n  margin-bottom: 1rem;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget input {\n    margin-bottom: 1.25rem;\n  }\n}\n.competition-widget textarea {\n  resize: none;\n  min-height: 10rem;\n  margin-bottom: 2rem;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget textarea {\n    margin-bottom: 1.25rem;\n  }\n}\n.competition-widget .checkbox-container {\n  display: block;\n  position: relative;\n  cursor: pointer;\n  margin-bottom: 0.75rem;\n}\n.competition-widget .checkbox-container input {\n  position: absolute;\n  top: 0;\n  left: 0;\n  opacity: 0;\n  margin-bottom: 0;\n  transform: translate(-100%, -100%);\n}\n.competition-widget .checkbox-container label {\n  cursor: pointer;\n}\n.competition-widget .checkbox-container input:checked + label .checkbox {\n  border-color: #333333;\n}\n.competition-widget .checkbox-container input:checked + label .checkbox svg {\n  visibility: visible;\n}\n.competition-widget .checkbox-container input:checked + label .text {\n  color: #333333;\n}\n.competition-widget .checkbox-container input:checked + label .text a {\n  color: #333333;\n}\n.competition-widget .checkbox-container .checkbox {\n  display: inline-flex;\n  border: 2px solid #888888;\n  padding: 1px;\n  border-radius: 0.125rem;\n  margin-right: 0.25rem;\n}\n.competition-widget .checkbox-container .checkbox svg {\n  visibility: hidden;\n  width: 0.75rem;\n  height: 0.75rem;\n  color: #888888;\n}\n.competition-widget .checkbox-container .text {\n  font-size: 0.875rem;\n  line-height: 1.25rem;\n  font-weight: 300;\n  color: #888888;\n}\n.competition-widget .checkbox-container .text a {\n  color: #888888;\n}\n.competition-widget .privacy-container {\n  font-size: 0.875rem;\n  line-height: 1.25rem;\n  font-weight: 300;\n  color: #333333;\n}\n.competition-widget .privacy-container a {\n  color: #333333;\n}\n.competition-widget button[type=submit] {\n  font-size: 1rem;\n  font-weight: 300;\n  line-height: 1.125rem;\n  text-align: center;\n  letter-spacing: 1.6px;\n  color: white;\n  background: #e2001a;\n  outline: none;\n  border: none;\n  text-transform: uppercase;\n  padding: 0.625rem 2.25rem;\n  margin-top: 2.5rem;\n  cursor: pointer;\n}\n.competition-widget button[type=submit]:disabled {\n  background: #d6d6d6;\n  color: #888888;\n  cursor: not-allowed;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget button[type=submit] {\n    font-size: 1.125rem;\n    line-height: 1.25rem;\n    letter-spacing: 1.8px;\n    padding: 0.875rem 2.25rem;\n  }\n}\n.competition-widget .required-hint {\n  font-size: 0.625rem;\n  line-height: 0.75rem;\n  font-weight: 300;\n  color: #555555;\n  margin-top: 1rem;\n}\n.competition-widget .messages {\n  margin-top: 0.5rem;\n  min-height: 1rem;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget .messages {\n    min-height: 1.5rem;\n  }\n}\n.competition-widget .messages .error-message {\n  display: flex;\n}\n.competition-widget .messages .error-message .icon,\n.competition-widget .messages .error-message .icon.svg {\n  width: 0.75rem;\n  height: 0.75rem;\n  fill: #1d508d;\n  margin-right: 0.25rem;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget .messages .error-message .icon,\n.competition-widget .messages .error-message .icon.svg {\n    display: none;\n  }\n}\n.competition-widget .messages .error-message .message {\n  font-size: 0.75rem;\n  line-height: 0.75rem;\n  font-weight: 300;\n  color: #1d508d;\n}\n@media screen and (min-width: 1024px) {\n  .competition-widget .messages .error-message .message {\n    font-size: 1.25rem;\n    line-height: 1.5rem;\n  }\n}\n.competition-widget .messages .success-message {\n  font-size: 1.25rem;\n  line-height: 1.5rem;\n  font-weight: 300;\n  font-style: italic;\n  color: #4ACB23;\n}";
+
+let CompetitionWidget = class CompetitionWidget extends s {
+    constructor() {
+        super(...arguments);
+        this.participation = new Participation({});
+    }
+    async connectedCallback() {
+        super.connectedCallback();
+        console.debug(this.competitionId);
+        this.translator = await getTranslationService().initTranslations('235977', getCountryService().getCountryCodeFromUrl());
+        this.competition = await getCompetitionService().loadCompetition(this.competitionId);
+        console.debug(this.competition);
+        getCustomerService().subscribeForCustomer('COMPETITION-WIDGET', this.onCustomerSubscription.bind(this));
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+    }
+    onCustomerSubscription(customer) {
+        var _a, _b, _c, _d;
+        this.customer = customer;
+        const customerData = {
+            email: customer === null || customer === void 0 ? void 0 : customer.email,
+            firstName: (_a = customer === null || customer === void 0 ? void 0 : customer.profile) === null || _a === void 0 ? void 0 : _a.firstName,
+            lastName: (_b = customer === null || customer === void 0 ? void 0 : customer.profile) === null || _b === void 0 ? void 0 : _b.lastName,
+            gender: (_c = customer === null || customer === void 0 ? void 0 : customer.profile) === null || _c === void 0 ? void 0 : _c.gender,
+            country: customer === null || customer === void 0 ? void 0 : customer.countryCode,
+            dressSize: (_d = customer === null || customer === void 0 ? void 0 : customer.profile) === null || _d === void 0 ? void 0 : _d.size
+        };
+        this.participation = new Participation(customerData);
+    }
+    handleParticipationChange(e) {
+        const { id, type, checked, value } = e.target;
+        this.participation = new Participation(Object.assign(Object.assign({}, this.participation), { [id]: type === 'checkbox' ? checked : value }));
+    }
+    async onSubmit(e) {
+        e.preventDefault();
+        this.successMessage = null; //clear
+        this.errorMessage = null; //clear
+        if (!this.participation.isValid()) {
+            return;
+        }
+        try {
+            await getCompetitionService().participate(this.competitionId, this.participation);
+            this.successMessage = this.translator.translate('widget.participate.success');
+            this.participation = new Participation({}); // reset
+        }
+        catch (e) {
+            const err = e;
+            if (err.code === 100) {
+                // validation failed
+                this.errorMessage = this.translator.translate('widget.error.validation');
+            }
+            else if (err.code === 200) {
+                // already participated
+                this.errorMessage = this.translator.translate('widget.error.alreadyParticipated');
+            }
+            else {
+                // other error
+                console.log('error while participating: ', err);
+                this.errorMessage = this.translator.translate('widget.error.other');
+            }
+        }
+    }
+    replaceWildcard(key, replacement) {
+        var _a;
+        const translation = (_a = this.translator.translate(key)) === null || _a === void 0 ? void 0 : _a.split('{0}');
+        return translation ? p `${translation[0]}${replacement}${translation[1]}` : key;
+    }
+    render() {
+        if (!this.translator || !this.competition || !this.participation) {
+            return null;
+        }
+        if (!this.competition.isValid()) {
+            return p `
+        <style>${styles$3}</style>
+        <div class="competition-widget">
+          <div class="title">${this.competition.name}</div>
+          <div class="competition-invalid">
+            ${this.translator.translate('widget.competition.notValid')}
+          </div>
+        </div>
+      `;
+        }
+        return p `
+    <style>${styles$3}</style>
+    <div class="competition-widget">
+      <form @submit="${this.onSubmit}">
+      <div class="email-container">
+        <label>${this.translator.translate('widget.email.label')}*</label>
+        <input id="email" type="email" placeholder="${this.translator.translate('widget.email.placeholder')}*" .value="${this.participation.email}" @keyup="${this.handleParticipationChange}">
+      </div>
+
+        <textarea id="text" placeholder="${this.translator.translate('widget.text.placeholder')}" .value="${this.participation.text}" @keyup="${this.handleParticipationChange}"></textarea>
+
+        <div class="checkbox-container">
+         <input id="termsParticipation" type="checkbox" @click="${this.handleParticipationChange}" .checked="${this.participation.termsParticipation}" required>
+          <label for="termsParticipation">
+            <span class="checkbox"><svg><use xlink:href="/img/icons/sprites.svg#check"></use></svg></span>
+            <span class="text">${this.replaceWildcard('widget.terms.participation', p `<a href="${this.termsUrl ? this.termsUrl : this.competition.terms ? this.competition.terms : '/legal/terms-competition/'}" target="_blank">${this.translator.translate('widget.terms.participation.linkText')}</a>`)}</span>
+          </label>
+        </div>
+
+        <div class="checkbox-container">
+         <input id="termsAdvertisement" type="checkbox" @click="${this.handleParticipationChange}" .checked="${this.participation.termsAdvertisement}">
+          <label for="termsAdvertisement">
+            <span class="checkbox"><svg><use xlink:href="/img/icons/sprites.svg#check"></use></svg></span>
+            <span class="text">${this.replaceWildcard('widget.terms.advertisement', p `<a href="/legal/privacy/#newsletter" target="_blank">${this.translator.translate('widget.terms.advertisement.linkText')}</a>`)}</span>
+          </label>
+        </div>
+
+        <div class="privacy-container">
+          ${this.replaceWildcard('widget.terms.privacy', p `<a href="/legal/privacy/" target="_blank">${this.translator.translate('widget.terms.privacy.linkText')}</a>`)}
+        </div>
+
+        <button type="submit" .disabled="${!this.participation.isValid()}">${this.translator.translate('widget.submit.button')}</button>
+
+        <div class="messages">
+            ${this.errorMessage && p `<div class="error-message"><svg class="icon"><use xlink:href="/img/icons/sprites.svg#exclamation-circle"/></svg><span class="message">${this.errorMessage}</span></div>`}
+            ${this.successMessage && p `<div class="success-message">${this.translator.translate('widget.participate.success')}</div>`}
+        </div>
+
+        <div class="required-hint">${this.translator.translate('widget.terms.requiredHint')}</div>
+      </form>
+    </div>
+    `;
+    }
+};
+__decorate([
+    e()
+], CompetitionWidget.prototype, "competitionId", void 0);
+__decorate([
+    e()
+], CompetitionWidget.prototype, "termsUrl", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "translator", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "competition", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "participation", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "customer", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "errorMessage", void 0);
+__decorate([
+    t()
+], CompetitionWidget.prototype, "successMessage", void 0);
+CompetitionWidget = __decorate([
+    n('competition-widget')
+], CompetitionWidget);
+
+var styles$2 = ":host {\n  display: block;\n}\n:host * {\n  font-family: Roboto, sans-serif;\n  box-sizing: border-box;\n}\n\n.registration-widget {\n  font-size: 0.875rem;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget {\n    font-size: 1rem;\n  }\n}\n.registration-widget a {\n  color: #242424;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .columns {\n    display: flex;\n  }\n}\n.registration-widget .columns .column {\n  flex: 1;\n  position: relative;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .columns .column {\n    margin: 0 2.5rem;\n  }\n  .registration-widget .columns .column:first-child {\n    margin-left: 0;\n  }\n  .registration-widget .columns .column:last-child {\n    margin-right: 0;\n  }\n}\n.registration-widget #login-form {\n  margin: 0 1rem;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget #login-form {\n    max-width: 25rem;\n    margin: 0 auto;\n  }\n}\n.registration-widget #login-form .input {\n  margin: 0.75rem 0 0 0;\n}\n.registration-widget #login-form .input input::placeholder {\n  visibility: visible;\n  color: #b2b2b2;\n}\n.registration-widget #login-form .remember-password {\n  text-align: right;\n}\n.registration-widget #login-form .remember-password a {\n  text-decoration: none;\n  color: #888888;\n  font-size: 0.875rem;\n}\n.registration-widget form .input {\n  margin: 2rem 0;\n}\n.registration-widget form .input label {\n  font-size: 0.75rem;\n  line-height: 0.75rem;\n  text-align: left;\n  color: #888888;\n  font-weight: 300;\n  white-space: nowrap;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget form .input label {\n    display: none;\n  }\n}\n@media screen and (min-width: 1024px) and (max-width: 1215px) {\n  .registration-widget form .input label {\n    display: none;\n  }\n}\n.registration-widget form .input input {\n  width: 100%;\n  border: none;\n  border-bottom: 1px solid #dbdbdb;\n  padding: 0.25rem 0;\n  outline: none;\n  font-weight: 300;\n  color: #555555;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget form .input input {\n    padding-top: 1.125rem;\n  }\n}\n.registration-widget form .input input::placeholder {\n  visibility: hidden;\n  color: #b2b2b2;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget form .input input::placeholder {\n    visibility: visible;\n  }\n}\n.registration-widget form .input input:hover {\n  border-color: #888888;\n}\n.registration-widget form .input input:disabled {\n  background-color: white;\n  color: #b2b2b2;\n}\n.registration-widget form .input input:disabled:hover {\n  border-color: #dbdbdb;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget form .input input {\n    font-size: 1.125rem;\n    line-height: 1.125rem;\n    padding-top: 0;\n    padding-bottom: 0.5rem;\n  }\n}\n.registration-widget form .input input.boxed {\n  border: 1px solid #d6d6d6;\n  padding: 0.875rem 1rem;\n}\n.registration-widget form .checkbox {\n  margin: 0.5rem 0;\n}\n.registration-widget form .checkbox input[type=checkbox] {\n  margin: 0;\n}\n.registration-widget form .checkbox label {\n  margin-left: 0.25rem;\n}\n.registration-widget form .stay-logged-in-reset-password-container {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  height: 1.875rem;\n}\n.registration-widget form .stay-logged-in-reset-password-container div {\n  display: flex;\n}\n.registration-widget form .stay-logged-in-reset-password-container #registration-widget-checkbox {\n  cursor: pointer;\n}\n.registration-widget form .stay-logged-in-reset-password-container .registration-widget-checkbox-label {\n  text-transform: none;\n  background-color: transparent;\n  letter-spacing: normal;\n  font-size: 0.875rem;\n  color: #888888;\n  font-weight: 300;\n  padding: 0;\n}\n.registration-widget form .stay-logged-in-reset-password-container .registration-widget-checkbox-label:hover {\n  color: #555555;\n  cursor: pointer;\n}\n.registration-widget form input[type=checkbox] {\n  height: 0;\n  width: 0;\n  margin: 0;\n}\n.registration-widget form input[type=checkbox] + label {\n  position: relative;\n  overflow: hidden;\n  cursor: pointer;\n}\n.registration-widget form input[type=checkbox] + label::before {\n  content: \"\";\n  display: inline-flex;\n  background-color: white;\n  border: 0.0625rem solid #888888;\n  border-radius: 0.125rem;\n  margin-right: 0.625rem;\n  height: 0.75rem;\n  width: 0.75rem;\n}\n.registration-widget form input[type=checkbox]:checked + label::after {\n  content: \"\";\n  position: absolute;\n  width: 0.5rem;\n  height: 0.125rem;\n  background: rgba(85, 85, 85, 0);\n  top: 0.3125rem;\n  left: 0.125rem;\n  border: 0.125rem solid #555555;\n  border-top: none;\n  border-right: none;\n  transform: rotate(-45deg);\n}\n.registration-widget .buttons {\n  text-align: center;\n  margin: 2rem 0;\n}\n.registration-widget .buttons .button {\n  font-size: 0.875rem;\n  font-weight: 300;\n  text-transform: uppercase;\n  letter-spacing: 0.7px;\n  padding: 0.625rem 1.5rem;\n  background: #e2001a;\n  color: white;\n  border: 1px solid white;\n  outline: none;\n  cursor: pointer;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .buttons .button {\n    font-size: 1.125rem;\n    line-height: 1.125rem;\n    padding: 0.875rem 2.25rem;\n  }\n}\n.registration-widget .buttons .button.text-style {\n  background: transparent;\n  border: none;\n  color: #555555;\n}\n.registration-widget .buttons .button.light {\n  background: transparent;\n  border: none;\n  color: #555555;\n}\n.registration-widget .buttons .button:disabled {\n  background: #dbdbdb;\n  color: #888888;\n  cursor: not-allowed;\n}\n.registration-widget .required-hint {\n  font-size: 0.75rem;\n  line-height: 0.75rem;\n  font-weight: 300;\n  color: #888888;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .required-hint {\n    text-align: center;\n  }\n}\n.registration-widget .messages {\n  margin-top: 0.5rem;\n  min-height: 1rem;\n  text-align: center;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .messages {\n    min-height: 1.5rem;\n  }\n}\n.registration-widget .messages .error-message {\n  font-size: 0.75rem;\n  line-height: 0.75rem;\n  font-weight: 300;\n  color: #1d508d;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .messages .error-message {\n    font-size: 1rem;\n    line-height: 1.25rem;\n  }\n}\n.registration-widget .messages .error-message .icon,\n.registration-widget .messages .error-message .icon.svg {\n  width: 0.75rem;\n  height: 0.75rem;\n  fill: #1d508d;\n  margin-right: 0.25rem;\n}\n@media screen and (min-width: 1024px) {\n  .registration-widget .messages .error-message .icon,\n.registration-widget .messages .error-message .icon.svg {\n    display: none;\n  }\n}\n.registration-widget .messages .success-message {\n  font-size: 1.25rem;\n  line-height: 1.5rem;\n  font-weight: 300;\n  font-style: italic;\n  color: #4ACB23;\n}";
+
+class LoginData {
+    constructor() {
+        this.email = "";
+        this.password = "";
+    }
+    valid() {
+        return !!(this.email && this.password);
+    }
+}
+class RegistrationData extends RegisterData {
+    constructor() {
+        super(...arguments);
+        this.email = "";
+        this.password = "";
+        this.passwordRepeat = "";
+        this.firstName = "";
+        this.lastName = "";
+    }
+    valid() {
+        const allFilled = !!(this.email && this.password && this.firstName && this.lastName && this.checkedTerms);
+        if (!allFilled) {
+            return false;
+        }
+        return this.password == this.passwordRepeat;
+    }
+}
+
+const TAG = "REGISTRATION-WIDGET";
+let RegistrationWidget = class RegistrationWidget extends s {
+    constructor() {
+        super(...arguments);
+        this.loginData = new LoginData();
+        this.saveLogin = false;
+        this.registrationData = new RegistrationData();
+    }
+    async connectedCallback() {
+        super.connectedCallback();
+        this.customerService = getCustomerService();
+        const countryService = getCountryService();
+        this.countryCode = countryService.getCountryCodeFromUrl();
+        countryService.subscribeForCurrentCountry(TAG, (country) => this.country = country);
+        this.translator = await getTranslationService().initTranslations('208671', this.countryCode);
+        this.customerService.subscribeForCustomer(TAG, this.onCustomerSubscription.bind(this));
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+    }
+    onCustomerSubscription(customer) {
+        console.log("got customer: ", customer);
+        const event = new CustomEvent('ny-customer-logged-in', {
+            detail: {
+                customer: customer
+            }
+        });
+        this.dispatchEvent(event);
+    }
+    toggleMode() {
+        this.isRegistration = !this.isRegistration;
+        this.scrollToTop();
+    }
+    // noinspection JSMethodCanBeStatic
+    scrollToTop() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    onLoginInput(e) {
+        const { value, name } = e.target;
+        this.loginData[name] = value;
+        this.loginEnabled = this.loginData.valid();
+    }
+    onSaveLoginChanged(e) {
+        this.saveLogin = e.target.checked;
+    }
+    async login(e) {
+        e.preventDefault();
+        this.loginError = false;
+        const loggedIn = await this.customerService.login(this.loginData.email, this.loginData.password, this.saveLogin);
+        this.loginError = !loggedIn;
+        this.scrollToTop();
+    }
+    onRegisterInput(e) {
+        const el = e.target;
+        const name = el.name;
+        let value = el.value;
+        if (el.type === 'checkbox') {
+            value = el.checked;
+        }
+        this.registrationData[name] = value;
+        this.registrationEnabled = this.registrationData.valid();
+    }
+    async register(e) {
+        e.preventDefault();
+        this.loginError = false;
+        this.registrationData.countryCode = this.country.iso_3166;
+        this.registrationData.optInEmailChannelLoyalty = this.country.loyalty;
+        this.registrationData.optInEmailChannelNewsletter = true;
+        const success = await this.customerService.registerCustomer(this.registrationData, this.saveLogin);
+        this.registrationError = !success;
+        this.scrollToTop();
+    }
+    i18n(key, ...params) {
+        return this.translator.translate(key, ...params);
+    }
+    countryUrl(url) {
+        if (!this.countryCode || this.countryCode == 'de') {
+            return url;
+        }
+        return `/${this.countryCode}${url}`;
+    }
+    render() {
+        if (!this.translator || !this.country) {
+            return null;
+        }
+        return p `
+    <style>${styles$2}</style>
+    <div class="registration-widget">
+     ${this.isRegistration
+            ? this.renderRegistration()
+            : this.renderLogin()}
+    </div>
+    `;
+    }
+    renderLogin() {
+        return p `
+     <form id="login-form" @submit="${this.login}">
+        <div class="messages">
+        ${this.loginError ?
+            p `<div class="error-message">${this.i18n('widget.registration.login.error')}</div>` : ''}
+        </div>
+        <div class="input">
+          <input id="login-email" class="boxed"  name="email" type="email" .value="${this.loginData.email}"
+                 @keyup="${this.onLoginInput}" title="${this.i18n('widget.registration.login.email')}"
+                 autocomplete="email" required="" placeholder="${this.i18n('widget.registration.login.email')}">
+        </div>
+        <div class="input">
+          <input id="login-password" class="boxed" name="password" type="password" .value="${this.loginData.password}"
+                 @keyup="${this.onLoginInput}" title="${this.i18n('widget.registration.login.password')}"
+                 autocomplete="password-new" required="" placeholder="${this.i18n('widget.registration.login.password')}" />
+        </div>
+       <div class="stay-logged-in-reset-password-container">
+         <div>
+           <input @click="${this.onSaveLoginChanged}" type="checkbox" id="registration-widget-checkbox" name="registration-widget-checkbox"/>
+           <label class="registration-widget-checkbox-label" for="registration-widget-checkbox">${this.translator.translate('widget.login.save-login')}</label>
+         </div>
+         <div class="remember-password">
+           <a href="/customer-profile/#/public/customer-profile/reset-password">${this.i18n('widget.registration.login.passwordRemember')}</a>
+         </div>
+       </div>
+
+        <div class="buttons">
+          ${!this.disableRegistration ? p `<button type="button" class="button light" @click="${this.toggleMode}">${this.i18n('widget.registration.button.register')}</button>` : ''}
+          <button class="button" ?disabled=${!this.loginEnabled}>${this.i18n('widget.registration.button.login')}</button>
+        </div>
+      </form>
+    `;
+    }
+    renderRegistration() {
+        return p `
+     <form id="registration-form" @submit="${this.register}">
+
+            ${this.registrationError ?
+            p `<div class="messages">
+                  <div class="error-message">${this.i18n('widget.registration.error')}</div>
+               </div>`
+            : ''}
+
+        <div class="columns">
+          <div class="column">
+            <div class="input">
+              <label for="email">${this.i18n('widget.registration.email')}*</label>
+              <input id="email" name="email" type="email" title="${this.i18n('widget.registration.email')}" .value="${this.registrationData.email}" @keyup="${this.onRegisterInput}" autocomplete="email" required="" placeholder="${this.i18n('widget.registration.email')}*">
+            </div>
+            <div class="input">
+              <label for="password">${this.i18n('widget.registration.password')}*</label>
+              <input id="password" name="password" type="password" .value="${this.registrationData.password}" @keyup="${this.onRegisterInput}" title="${this.i18n('widget.registration.password')}" autocomplete="password-new" required="" minlength="8"
+                     placeholder="${this.i18n('widget.registration.password')}*" />
+            </div>
+            <div class="input">
+              <label for="passwordRepeat">${this.i18n('widget.registration.passwordRepeat')}*</label>
+              <input id="passwordRepeat" name="passwordRepeat" type="password" .value="${this.registrationData.passwordRepeat}" @keyup="${this.onRegisterInput}" title="${this.i18n('widget.registration.passwordRepeat')}" autocomplete="password-new"
+                     required="" minlength="8" placeholder="${this.i18n('widget.registration.passwordRepeat')}*">
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="input">
+              <label for="firstName">${this.i18n('widget.registration.firstName')}*</label>
+              <input id="firstName" name="firstName" type="text" .value="${this.registrationData.firstName}" @keyup="${this.onRegisterInput}" title="${this.i18n('widget.registration.firstName')}" autocomplete="given-name"
+                     required="" placeholder="${this.i18n('widget.registration.firstName')}*">
+            </div>
+            <div class="input">
+              <label for="lastName">${this.i18n('widget.registration.lastName')}*</label>
+              <input id="lastName" name="lastName" type="text" .value="${this.registrationData.lastName}" @keyup="${this.onRegisterInput}" title="${this.i18n('widget.registration.lastName')}" autocomplete="family-name"
+                     required="" placeholder="${this.i18n('widget.registration.lastName')}*">
+            </div>
+            <div class="input">
+              <label for="country">${this.i18n('widget.registration.country')}*</label>
+              <input id="country" name="country" type="text" .value="${this.country.localized_name}" title="${this.i18n('widget.registration.country')}"
+                     disabled placeholder="${this.i18n('widget.registration.country')}*">
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="checkbox">
+            <input type="checkbox" id="newsletter" name="optInEmailAdvertisementConsent" .value="${this.registrationData.optInEmailAdvertisementConsent}" @change="${this.onRegisterInput}">
+            <label for="newsletter">${o(this.i18n('widget.registration.advertisementConsent', this.countryUrl("/legal/privacy/#newsletter")))}</label>
+          </div>
+          <div class="checkbox">
+            <input type="checkbox" id="checkedTerms" name="checkedTerms" required="" .value="${this.registrationData.checkedTerms}" @change="${this.onRegisterInput}">
+            <label for="checkedTerms">${o(this.i18n('widget.registration.termsConsent', this.countryUrl("/legal/terms-of-use/")))}*</label>
+          </div>
+          <div class="">
+            ${o(this.i18n('widget.registration.privacyConsent', this.countryUrl("/legal/privacy/")))}
+          </div>
+        </div>
+        <div class="buttons">
+          <button type="button" class="button light" @click="${this.toggleMode}">${this.i18n('widget.registration.button.login')}</button>
+          <button class="button" ?disabled=${!this.registrationEnabled}>${this.i18n('widget.registration.button.register')}</button>
+        </div>
+        <div class="required-hint">
+          ${this.i18n('widget.registration.requiredHint')}
+        </div>
+      </form>
+    `;
+    }
+};
+__decorate([
+    t()
+], RegistrationWidget.prototype, "country", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "translator", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "customerService", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "isRegistration", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "loginEnabled", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "loginError", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "loginData", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "saveLogin", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "registrationEnabled", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "registrationError", void 0);
+__decorate([
+    t()
+], RegistrationWidget.prototype, "registrationData", void 0);
+__decorate([
+    e()
+], RegistrationWidget.prototype, "disableRegistration", void 0);
+RegistrationWidget = __decorate([
+    n('registration-widget')
+], RegistrationWidget);
+
+var styles$1 = ":host {\n  display: block;\n}\n:host * {\n  font-family: \"Roboto\", sans-serif;\n  box-sizing: border-box;\n}\n\n:host(.interstitial) .inline-newsletter .newsletter-container {\n  padding: 4.5rem 1rem;\n}\n@media screen and (max-width: 767px) {\n  :host(.interstitial) .inline-newsletter .newsletter-container {\n    padding: 3.75rem 1.25rem 1rem;\n  }\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .text-container {\n  color: white;\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .text-container .newsletter-header {\n  font-size: 1.75rem;\n  line-height: 1.75rem;\n  text-transform: uppercase;\n  font-weight: 800;\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .text-container .description {\n  font-weight: 300;\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .controls {\n  height: auto;\n}\n@media screen and (max-width: 767px) {\n  :host(.interstitial) .inline-newsletter .newsletter-container .controls {\n    flex-direction: column;\n  }\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .controls .text-input,\n:host(.interstitial) .inline-newsletter .newsletter-container .controls .button {\n  height: 42px;\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .controls .button {\n  margin-bottom: 1rem;\n  background-color: #e2001a;\n  color: white;\n  border: none;\n}\n@media screen and (max-width: 767px) {\n  :host(.interstitial) .inline-newsletter .newsletter-container .controls .button {\n    margin-top: 2rem;\n  }\n}\n:host(.interstitial) .inline-newsletter .newsletter-container .controls .button:disabled {\n  color: #888888;\n  background-color: white;\n}\n\n@keyframes rotate {\n  from {\n    transform: rotate(0deg);\n  }\n  to {\n    transform: rotate(359deg);\n  }\n}\n.inline-newsletter {\n  /*OUTER CONTAINER*/\n  /*HIDDEN INPUT ELEMENT*/\n  /*FAKE RADIO BUTTON*/\n  /*LABEL OF RADIO BUTTON*/\n  /*LINK IN LABEL OF RADIO BUTTON*/\n  /*CHECKMARK OF FAKE RADIO BUTTON*/\n  /*CHECKED STATE BORDER*/\n  /*CHECKED STATE LABEL */\n  /*CHECKED STATE LINK IN LABEL*/\n  /*OUTER CONTAINER*/\n  /*HIDDEN INPUT ELEMENT*/\n  /*FAKE CHECKBOX*/\n  /*LABEL OF CHECKBOX*/\n  /*LINK IN LABEL OF CHECKBOX*/\n  /*CHECKMARK OF FAKE CHECKBOX*/\n  /*CHECKED STATE BORDER*/\n  /*CHECKED STATE LABEL */\n  /*CHECKED STATE LINK IN LABEL*/\n}\n.inline-newsletter .button.modal-button {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.inline-newsletter .button.modal-button.is-loading svg {\n  display: block;\n}\n.inline-newsletter .button.modal-button svg {\n  width: 1rem;\n  height: 1rem;\n  fill: white;\n  margin-right: 0.5rem;\n  animation: rotate 2s infinite linear;\n  display: none;\n}\n.inline-newsletter div .flatpickr-day.selected,\n.inline-newsletter div .flatpickr-day.selected:focus,\n.inline-newsletter div .flatpickr-day.selected:hover,\n.inline-newsletter div .flatpickr-day.selected.prevMonthDay,\n.inline-newsletter div .flatpickr-day.selected.nextMonthDay {\n  background: #E2001A;\n  border-color: #E2001A;\n}\n.inline-newsletter div .flatpickr-months .flatpickr-month {\n  background: #E2001A;\n  border-radius: 5px 5px 0 0;\n}\n.inline-newsletter div .flatpickr-calendar,\n.inline-newsletter div .flatpickr-calendar.open,\n.inline-newsletter div .flatpickr-weekdays {\n  background: #E2001A;\n}\n.inline-newsletter div.flatpickr-calendar {\n  box-shadow: 1px 0 0 #B2B2B2, -1px 0 0 #B2B2B2, 0 1px 0 #B2B2B2, 0 -1px 0 #B2B2B2, 0 3px 13px rgba(0, 0, 0, 0.08);\n}\n.inline-newsletter div.flatpickr-calendar .numInputWrapper span {\n  opacity: 1;\n}\n.inline-newsletter div.flatpickr-calendar.arrowTop:after {\n  border-bottom-color: #E2001A;\n}\n.inline-newsletter .space-top {\n  margin-top: 1rem;\n}\n.inline-newsletter .space-left {\n  margin-left: 1.5rem;\n}\n.inline-newsletter .mobile-only {\n  display: none;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .mobile-only {\n    display: block;\n  }\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .hide-mobile {\n    display: none;\n  }\n}\n.inline-newsletter .newsletter-container {\n  color: #333333;\n  font-weight: 300;\n  width: 640px;\n  padding-top: 92px;\n  padding-bottom: 36px;\n  margin-left: auto;\n  margin-right: auto;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  text-align: center;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container {\n    width: 100%;\n    padding: 40px 20px 16px;\n  }\n}\n.inline-newsletter .newsletter-container .text-container {\n  padding-left: 32px;\n  padding-right: 32px;\n  margin-bottom: 32px;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .text-container {\n    padding-left: 16px;\n    padding-right: 16px;\n  }\n}\n.inline-newsletter .newsletter-container .text-container .newsletter-header {\n  font-size: 2.25rem;\n  line-height: 2.25rem;\n  margin-bottom: 24px;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .text-container .newsletter-header {\n    font-size: 1.5rem;\n    line-height: 1.5rem;\n  }\n}\n.inline-newsletter .newsletter-container .text-container .description {\n  line-height: 1.5rem;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .text-container .description {\n    line-height: 1.25rem;\n    font-size: 0.875rem;\n  }\n}\n.inline-newsletter .newsletter-container .hint {\n  font-size: 0.75rem;\n  color: #555555;\n  line-height: 0.75rem;\n  font-weight: 300;\n  margin-top: 32px;\n}\n.inline-newsletter .newsletter-container .controls {\n  display: flex;\n  height: 48px;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .controls {\n    height: 36px;\n    width: 100%;\n  }\n}\n.inline-newsletter .newsletter-container .controls .text-input {\n  height: 100%;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .controls .text-input {\n    font-size: 0.75rem;\n    line-height: 0.75rem;\n    width: 100%;\n    margin-right: 12px;\n  }\n}\n.inline-newsletter .newsletter-container .controls .button {\n  background-color: #888888;\n  border-radius: 0;\n}\n@media screen and (max-width: 767px) {\n  .inline-newsletter .newsletter-container .controls .button {\n    font-size: 0.75rem;\n    line-height: 0.75rem;\n    padding-left: 16px;\n    padding-right: 16px;\n    height: 100%;\n  }\n}\n.inline-newsletter .newsletter-container .controls .button:disabled {\n  background-color: white;\n  color: #888888;\n  border: #888888 solid 1px;\n}\n.inline-newsletter .required-text {\n  font-size: 0.6rem;\n  color: #b2b2b2;\n  margin-top: 2rem;\n}\n.inline-newsletter .radio-container {\n  cursor: pointer;\n  display: flex;\n}\n@media screen and (min-width: 1024px) {\n  .inline-newsletter .radio-container:hover .radiobutton + label {\n    border-color: white;\n  }\n  .inline-newsletter .radio-container:hover .radio-label {\n    color: white;\n  }\n  .inline-newsletter .radio-container:hover .radio-label a {\n    color: white;\n  }\n}\n.inline-newsletter .radio-container .radiobutton {\n  display: none;\n  width: 0;\n  height: 0;\n}\n.inline-newsletter .radio-container .radiobutton + label {\n  cursor: pointer;\n  border: 2px solid #B2B2B2;\n  background-color: transparent;\n  padding: 0.4rem;\n  border-radius: 2px;\n  position: relative;\n  vertical-align: text-bottom;\n  margin-left: 1rem;\n  margin-right: 0.5rem;\n  width: 0;\n  height: 0;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .radio-container:first-child .radiobutton + label {\n    margin-left: 0;\n  }\n}\n.inline-newsletter .radio-container .radio-label {\n  cursor: pointer;\n  display: inline;\n  color: #B2B2B2;\n  font-size: 1.125rem;\n  font-weight: 300;\n  line-height: 1.125rem;\n}\n.inline-newsletter .radio-container .radio-label a {\n  color: #B2B2B2;\n}\n.inline-newsletter .radio-container .radiobutton:checked + label:after {\n  content: \"\";\n  width: 0.8rem;\n  height: 0.6rem;\n  display: block;\n  background: url(\"data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTE3My44OTggNDM5LjQwNGwtMTY2LjQtMTY2LjRjLTkuOTk3LTkuOTk3LTkuOTk3LTI2LjIwNiAwLTM2LjIwNGwzNi4yMDMtMzYuMjA0YzkuOTk3LTkuOTk4IDI2LjIwNy05Ljk5OCAzNi4yMDQgMEwxOTIgMzEyLjY5IDQzMi4wOTUgNzIuNTk2YzkuOTk3LTkuOTk3IDI2LjIwNy05Ljk5NyAzNi4yMDQgMGwzNi4yMDMgMzYuMjA0YzkuOTk3IDkuOTk3IDkuOTk3IDI2LjIwNiAwIDM2LjIwNGwtMjk0LjQgMjk0LjQwMWMtOS45OTggOS45OTctMjYuMjA3IDkuOTk3LTM2LjIwNC0uMDAxeiI+PC9wYXRoPjwvc3ZnPg==\") no-repeat center;\n  position: absolute;\n  top: 2px;\n  left: 0;\n}\n.inline-newsletter .radio-container .radiobutton:checked + label {\n  border: 2px solid white;\n}\n.inline-newsletter .radio-container .radiobutton:checked ~ .radio-label {\n  color: white;\n}\n.inline-newsletter .radio-container .radiobutton:checked ~ .radio-label a {\n  color: white;\n}\n.inline-newsletter .icon svg {\n  width: 24px;\n  height: 24px;\n}\n.inline-newsletter .solid {\n  fill: #888888;\n  stroke: none;\n}\n.inline-newsletter .modal {\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n  background-color: rgba(255, 255, 255, 0.5);\n  z-index: 9999;\n}\n.inline-newsletter .step-1 {\n  display: block;\n}\n.inline-newsletter .step-1.toggle {\n  display: none;\n}\n.inline-newsletter .modal .modal-content {\n  position: fixed;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  width: 900px;\n  height: 400px;\n  background-color: #333333;\n  box-shadow: 0 0 35px rgba(0, 0, 0, 0.35);\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal .modal-content {\n    width: 100%;\n    height: 100%;\n    overflow-y: scroll;\n  }\n}\n.inline-newsletter .modal-content .content-center {\n  margin: 3rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .content-center {\n    margin: 3rem 1.25rem 2rem 1.25rem;\n  }\n}\n.inline-newsletter .modal-content .column-right {\n  margin-left: 2.5rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .column-right {\n    margin-left: 0;\n    margin-top: 1.125rem;\n  }\n}\n.inline-newsletter .modal-content .modal-close-button {\n  position: absolute;\n  right: 0;\n  margin-right: 1.25rem;\n  margin-top: 1.25rem;\n  cursor: pointer;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .modal-close-button {\n    margin-right: 0.75rem;\n    margin-top: 0.75rem;\n  }\n}\n.inline-newsletter .modal-content .modal-inputs {\n  display: flex;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .modal-inputs input:first-child {\n    margin-bottom: 1rem;\n  }\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .modal-inputs {\n    flex-direction: column;\n  }\n}\n.inline-newsletter .modal-inputs .input-birthday {\n  width: 12.5rem;\n}\n.inline-newsletter .modal-inputs .input-email {\n  width: 20rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-inputs .input-birthday {\n    width: 95%;\n  }\n  .inline-newsletter .modal-inputs .input-email {\n    width: 95%;\n  }\n}\n.inline-newsletter .modal-content .intrests-container {\n  display: flex;\n  margin-top: 1.5rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .intrests-container {\n    flex-direction: column;\n    margin-top: 2rem;\n  }\n}\n.inline-newsletter .intrests-container .intrest-radio-wrapper {\n  display: flex;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .intrests-container .intrest-radio-wrapper {\n    display: flex;\n    flex-direction: row;\n    margin-top: 0.875rem;\n  }\n}\n.inline-newsletter .modal-content .modal-legals-container {\n  margin-top: 2.5rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .modal-legals-container {\n    margin-top: 4rem;\n  }\n}\n.inline-newsletter .modal-content .modal-legals-container-international {\n  margin-top: 2rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .modal-legals-container-international {\n    margin-top: 3.5rem;\n  }\n}\n.inline-newsletter .modal-legals-container-international .checkbox-container {\n  margin-bottom: 1rem;\n}\n.inline-newsletter .modal-content .sign-up-button-container {\n  position: absolute;\n  right: 4rem;\n  bottom: 4rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-content .sign-up-button-container {\n    position: static;\n    width: 100%;\n    display: flex;\n    margin-top: 2.25rem;\n  }\n  .inline-newsletter .modal-registration-done .sign-up-button-container {\n    margin-top: 1.5rem;\n  }\n  .inline-newsletter .modal-legals-container-international + .sign-up-button-container {\n    margin-top: 3.7rem;\n  }\n}\n.inline-newsletter .get-more-logo-container .get-more-logo {\n  width: 115px;\n  height: 110px;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .get-more-logo-container {\n    display: flex;\n  }\n  .inline-newsletter .get-more-logo-container .get-more-logo {\n    margin-left: auto;\n    margin-right: auto;\n  }\n}\n.inline-newsletter .welcome-text-container .font-welcome-text:first-child {\n  margin-bottom: 0.875rem;\n}\n.inline-newsletter .modal-registration-done .get-more-info {\n  display: flex;\n  flex-direction: row;\n  margin-top: 2.5rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .modal-registration-done .get-more-info {\n    flex-direction: column;\n    margin-top: 1.125rem;\n  }\n}\n.inline-newsletter .font-bigger-header {\n  font-weight: 400;\n  color: white;\n  line-height: 4rem;\n  font-size: 40px;\n  margin-top: 0;\n}\n.inline-newsletter .modal-registration-done .font-bigger-header {\n  margin-bottom: 0;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .font-bigger-header {\n    font-size: 2rem;\n    line-height: 2.125rem;\n    margin-bottom: 2rem;\n  }\n  .inline-newsletter .modal-registration-done .font-bigger-header {\n    margin-bottom: 1.125rem;\n  }\n}\n.inline-newsletter .font-bigger-header.margin-bottom {\n  margin: 0 0 1.125rem 0;\n}\n.inline-newsletter .font-radio-label {\n  font-size: 1.125rem;\n  font-weight: 300;\n  line-height: 1.125rem;\n  color: white;\n  margin: 0;\n}\n.inline-newsletter .font-legals-terms {\n  font-size: 0.875rem;\n  font-weight: 300;\n  line-height: 1.125rem;\n  color: white;\n}\n.inline-newsletter .font-legals-terms a {\n  color: white;\n}\n.inline-newsletter .font-links {\n  color: white;\n}\n.inline-newsletter .font-welcome-text {\n  font-size: 1.125rem;\n  font-weight: 300;\n  color: white;\n  line-height: 1.625rem;\n  max-width: 620px;\n}\n.inline-newsletter .font-welcome-text.is-large {\n  font-size: 1.75rem;\n  margin-top: 2rem;\n}\n.inline-newsletter .column-right .font-welcome-text {\n  max-width: 400px;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .column-right .font-welcome-text {\n    font-size: 1rem;\n    line-height: 1.375rem;\n  }\n  .inline-newsletter .modal-registration-done .font-welcome-text {\n    font-size: 1rem;\n  }\n  .inline-newsletter .modal-registration-done .font-welcome-text.is-large {\n    font-size: 1.75rem;\n    margin-top: 2rem;\n    margin-bottom: 6rem;\n  }\n  .inline-newsletter .column-right .mobile-only .font-welcome-text {\n    max-width: 300px;\n  }\n}\n.inline-newsletter .font-sub-header {\n  font-weight: 400;\n  font-size: 1.5rem;\n  line-height: 1.625rem;\n  color: white;\n  margin: 0 0 1rem;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .font-sub-header {\n    font-weight: 300;\n    font-size: 1rem;\n    margin: 0;\n    line-height: 1.375rem;\n  }\n}\n.inline-newsletter .text-input {\n  width: 23.75rem;\n  height: 2.7rem;\n  outline: none;\n  border: 1px solid #888888;\n  color: #555555;\n  font-size: 1rem;\n  padding-left: 12px;\n  margin-right: 1.25rem;\n  font-weight: 300;\n}\n.inline-newsletter .text-input::placeholder {\n  color: #B2B2B2;\n  font-weight: 300;\n}\n.inline-newsletter .text-input:hover::placeholder {\n  color: #555555;\n}\n.inline-newsletter .text-input:placeholder-shown {\n  border: 1px solid #D6D6D6;\n}\n.inline-newsletter .text-input:focus,\n.inline-newsletter .text-input:hover {\n  border: 1px solid #888888;\n  color: #555555;\n}\n.inline-newsletter .text-input:focus::placeholder {\n  color: #555555;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .text-input {\n    margin: 0;\n    width: 95%;\n  }\n}\n.inline-newsletter .button {\n  min-width: 8.75rem;\n  height: 2.9rem;\n  border: none;\n  font-weight: 300;\n  font-size: 0.9rem;\n  letter-spacing: 0.05rem;\n  text-transform: uppercase;\n  background-color: #E2001A;\n  color: white;\n  cursor: pointer;\n  transition: background-color 0.2s linear;\n}\n.inline-newsletter .button:disabled {\n  cursor: not-allowed;\n  background-color: #888888;\n}\n@media screen and (max-width: 768px) {\n  .inline-newsletter .button {\n    margin-left: auto;\n    margin-right: auto;\n  }\n}\n.inline-newsletter .checkbox-container {\n  cursor: pointer;\n  display: flex;\n}\n@media screen and (min-width: 1024px) {\n  .inline-newsletter .checkbox-container:hover .checkbox + label {\n    border: 2px solid white;\n  }\n  .inline-newsletter .checkbox-container:hover .checkbox-label {\n    color: white;\n  }\n  .inline-newsletter .checkbox-container:hover .checkbox-label a {\n    color: white;\n  }\n}\n.inline-newsletter .checkbox-container .checkbox {\n  display: none;\n  width: 0;\n  height: 0;\n}\n.inline-newsletter .checkbox-container .checkbox + label {\n  cursor: pointer;\n  border: 2px solid #B2B2B2;\n  background-color: transparent;\n  padding: 0.35rem;\n  border-radius: 2px;\n  position: relative;\n  vertical-align: text-bottom;\n  margin-right: 0.5rem;\n  margin-top: 1px;\n  width: 0;\n  height: 0;\n}\n.inline-newsletter .checkbox-container .checkbox-label {\n  cursor: pointer;\n  display: inline;\n  color: #B2B2B2;\n  font-size: 0.875rem;\n  font-weight: 300;\n  line-height: 1.125rem;\n  max-width: 500px;\n}\n.inline-newsletter .checkbox-container .checkbox-label a {\n  color: #B2B2B2;\n}\n.inline-newsletter .checkbox-container .checkbox:checked + label:after {\n  content: \"\";\n  width: 0.65rem;\n  height: 0.45rem;\n  display: block;\n  background: url(\"data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTE3My44OTggNDM5LjQwNGwtMTY2LjQtMTY2LjRjLTkuOTk3LTkuOTk3LTkuOTk3LTI2LjIwNiAwLTM2LjIwNGwzNi4yMDMtMzYuMjA0YzkuOTk3LTkuOTk4IDI2LjIwNy05Ljk5OCAzNi4yMDQgMEwxOTIgMzEyLjY5IDQzMi4wOTUgNzIuNTk2YzkuOTk3LTkuOTk3IDI2LjIwNy05Ljk5NyAzNi4yMDQgMGwzNi4yMDMgMzYuMjA0YzkuOTk3IDkuOTk3IDkuOTk3IDI2LjIwNiAwIDM2LjIwNGwtMjk0LjQgMjk0LjQwMWMtOS45OTggOS45OTctMjYuMjA3IDkuOTk3LTM2LjIwNC0uMDAxeiI+PC9wYXRoPjwvc3ZnPg==\") no-repeat center;\n  position: absolute;\n  top: 2px;\n  left: 1px;\n}\n.inline-newsletter .checkbox-container .checkbox:checked + label {\n  border: 2px solid white;\n}\n.inline-newsletter .checkbox-container .checkbox:checked ~ .checkbox-label {\n  color: white;\n}\n.inline-newsletter .checkbox-container .checkbox:checked ~ .checkbox-label a {\n  color: white;\n}";
+
+const WidgetContext = D(null);
+const NewsletterTrackingEvent = 'NEWSLETTER_TRACKING_EVENT';
+const NewsletterSuccessEvent = 'NEWSLETTER_SUCCESS_EVENT';
+var EventAction;
+(function (EventAction) {
+    EventAction["OPEN"] = "OPEN";
+    EventAction["CLOSE"] = "CLOSE";
+    EventAction["SUCCESS"] = "SUCCESS";
+    EventAction["FAILED"] = "FAILED";
+})(EventAction || (EventAction = {}));
+
+function Registration(props) {
+    const { i18n, countryCode, email, actions } = F(WidgetContext);
+    const [state, setState] = l(null);
+    const emailInput = s$1();
+    const dateInput = s$1();
+    const interestFemale = s$1();
+    const interestMale = s$1();
+    const privacy = s$1();
+    const terms = s$1();
+    const signUpButton = s$1();
+    y(() => {
+        emailInput.current.value = email;
+    }, []);
+    function toggleCheckbox(box, e) {
+        if (e && e.target instanceof HTMLAnchorElement) {
+            e.stopPropagation();
+            return;
+        }
+        box.checked = !box.checked;
+        validateRegistration();
+    }
+    function validateRegistration() {
+        const button = signUpButton.current;
+        const { validateEmail } = actions;
+        const email = emailInput.current.value;
+        const birthday = dateInput.current ? dateInput.current.value : null;
+        const checkFemale = interestFemale.current.checked;
+        const checkMale = interestMale.current.checked;
+        const acceptPrivacy = privacy.current ? privacy.current.checked : true;
+        const acceptTerms = terms.current.checked;
+        setState({ email: email, birthday: birthday, interestFemale: checkFemale, interestMale: checkMale, acceptedPrivacy: acceptPrivacy, acceptedTerms: acceptTerms });
+        const valid = validateEmail(email) && acceptPrivacy && acceptTerms;
+        button.disabled = !valid;
+    }
+    async function submitRegistration() {
+        const button = signUpButton.current;
+        button.disabled = true;
+        button.classList.add('is-loading');
+        const req = {
+            email: state.email,
+            countryCode: countryCode,
+            birthday: state.birthday ? new Date(state.birthday) : null,
+            optInEmailAdvertisementConsent: state.acceptedTerms,
+            optInEmailChannelLoyalty: countryCode === 'de',
+            optInEmailChannelNewsletter: state.acceptedTerms,
+            optInEmailChannelWomensFashion: state.interestFemale,
+            optInEmailChannelMensFashion: state.interestMale
+        };
+        try {
+            await getCustomerService().subscribeForNewsletter(req);
+            props.completionCallback();
+        }
+        catch (e) {
+            console.error('[newsletter-registration]: error while registering for newsletter:', e);
+            props.failedCallback();
+        }
+        finally {
+            button.disabled = false;
+            button.classList.remove('is-loading');
+        }
+    }
+    return (e$1("div", Object.assign({ class: "step-1" }, { children: [e$1("h1", Object.assign({ class: "font-bigger-header" }, { children: i18n.translate("newsletter.inline.modal.headline") }), void 0), e$1("div", Object.assign({ class: "modal-inputs" }, { children: [e$1("input", { ref: emailInput, type: "email", class: "text-input input-email", onInput: validateRegistration, placeholder: `${i18n.translate("newsletter.inline.input.email.placeholder")}*` }, void 0), ['at', 'ch', 'cz', 'fr', 'hr', 'pl', 'ro', 'rs', 'ru', 'dk', 'fi', 'it', 'lu', 'nl', 'no', 'se'].includes(countryCode) &&
+                        e$1("input", { ref: dateInput, type: "date", class: "text-input input-birthday", onInput: validateRegistration, placeholder: i18n.translate("newsletter.inline.input.birthday.placeholder") }, void 0)] }), void 0), e$1("div", Object.assign({ class: "intrests-container" }, { children: [e$1("p", Object.assign({ class: "font-radio-label" }, { children: i18n.translate("newsletter.inline.interests.for") }), void 0), e$1("div", Object.assign({ class: "intrest-radio-wrapper" }, { children: [e$1("div", Object.assign({ class: "radio-container", onClick: () => toggleCheckbox(interestFemale.current) }, { children: [e$1("input", { ref: interestFemale, class: "radiobutton", type: "checkbox", name: "radio-intrest-select" }, void 0), e$1("label", {}, void 0), e$1("span", Object.assign({ class: "radio-label" }, { children: i18n.translate("newsletter.inline.interests.female") }), void 0)] }), void 0), e$1("div", Object.assign({ class: "radio-container", onClick: () => toggleCheckbox(interestMale.current) }, { children: [e$1("input", { ref: interestMale, class: "radiobutton", type: "checkbox", name: "radio-intrest-select" }, void 0), e$1("label", {}, void 0), e$1("span", Object.assign({ class: "radio-label" }, { children: i18n.translate("newsletter.inline.interests.male") }), void 0)] }), void 0)] }), void 0)] }), void 0), e$1("div", Object.assign({ class: "modal-legals-container" }, { children: [countryCode !== 'de' &&
+                        e$1("div", Object.assign({ class: "checkbox-container", onClick: (e) => toggleCheckbox(privacy.current, e) }, { children: [e$1("input", { ref: privacy, class: "checkbox", type: "checkbox", name: "radio-intrest-select" }, void 0), e$1("label", {}, void 0), e$1("span", { class: "checkbox-label", dangerouslySetInnerHTML: { __html: `${i18n.translate('newsletter.inline.legal.privacy', `${countryCode !== config.defaultLang ? `/${countryCode}` : ''}/legal/privacy/`)}*` } }, void 0)] }), void 0), e$1("div", Object.assign({ class: "checkbox-container space-top", onClick: (e) => toggleCheckbox(terms.current, e) }, { children: [e$1("input", { ref: terms, class: "checkbox", type: "checkbox", name: "radio-intrest-select" }, void 0), e$1("label", {}, void 0), e$1("span", { class: "checkbox-label", dangerouslySetInnerHTML: { __html: `${i18n.translate('newsletter.inline.use-of-data', `${countryCode !== config.defaultLang ? `/${countryCode}` : ''}/legal/privacy/#newsletter`)}*` } }, void 0)] }), void 0), countryCode === 'de' &&
+                        e$1("div", Object.assign({ class: "font-legals-terms space-top space-left" }, { children: e$1("span", { class: "checkbox-label", dangerouslySetInnerHTML: { __html: i18n.translate('newsletter.inline.legal.privacy', `${countryCode !== config.defaultLang ? `/${countryCode}` : ''}/legal/privacy/`) } }, void 0) }), void 0), e$1("div", Object.assign({ class: "required-text" }, { children: i18n.translate("newsletter.inline.required.text") }), void 0)] }), void 0), e$1("div", Object.assign({ class: "sign-up-button-container" }, { children: e$1("button", Object.assign({ ref: signUpButton, class: "button modal-button", onClick: submitRegistration, disabled: true }, { children: [e$1("svg", { children: e$1("use", { href: "/img/icons/sprites.svg#loading-indicator" }, void 0) }, void 0), e$1("span", { children: i18n.translate("newsletter.inline.button.subscribe") }, void 0)] }), void 0) }), void 0)] }), void 0));
+}
+
+function Completion() {
+    const { i18n, countryCode } = F(WidgetContext);
+    function routeTo(url) {
+        if (url.startsWith('http')) {
+            location.href = url;
+        }
+        else if (url.startsWith('/')) {
+            location.href = countryCode !== config.defaultLang ? `/${countryCode}${url}` : url;
+        }
+        else {
+            location.href = countryCode !== config.defaultLang ? `/${countryCode}/${url}` : `/${url}`;
+        }
+    }
+    return (e$1(d, { children: [countryCode === 'de' && e$1("div", Object.assign({ class: "modal-registration-done" }, { children: [e$1("h1", Object.assign({ class: "font-bigger-header" }, { children: i18n.translate("newsletter.inline.registration.welcome.headline") }), void 0), e$1("div", Object.assign({ class: "font-welcome-text hide-mobile" }, { children: i18n.translate("newsletter.inline.registration.welcome.text") }), void 0), e$1("div", Object.assign({ class: "font-welcome-text hide-mobile" }, { children: i18n.translate("newsletter.inline.registration.email") }), void 0), e$1("div", Object.assign({ class: "welcome-text-container mobile-only" }, { children: [e$1("div", Object.assign({ class: "font-welcome-text" }, { children: i18n.translate("newsletter.inline.registration.welcome.text") }), void 0), e$1("div", Object.assign({ class: "font-welcome-text" }, { children: i18n.translate("newsletter.inline.registration.email") }), void 0)] }), void 0), e$1("div", Object.assign({ class: "get-more-info" }, { children: [e$1("div", Object.assign({ class: "get-more-logo-container" }, { children: e$1("img", { class: "get-more-logo", src: "/img/newsletter/get-more-white.png", alt: 'GET MORE Logo' }, void 0) }), void 0), e$1("div", Object.assign({ class: "column-right" }, { children: [e$1("div", Object.assign({ class: "sub-header-container hide-mobile" }, { children: e$1("h3", Object.assign({ class: "font-sub-header" }, { children: i18n.translate("newsletter.inline.get-more.subheader") }), void 0) }), void 0), e$1("div", Object.assign({ class: "font-welcome-text hide-mobile" }, { children: i18n.translate("newsletter.inline.get-more.text") }), void 0), e$1("div", Object.assign({ class: "mobile-only" }, { children: e$1("div", Object.assign({ class: "font-welcome-text" }, { children: [i18n.translate("newsletter.inline.get-more.subheader"), i18n.translate("newsletter.inline.get-more.text")] }), void 0) }), void 0), e$1("div", Object.assign({ class: "sign-up-button-container" }, { children: e$1("button", Object.assign({ class: "button", onClick: () => routeTo('/get-more-club/#/') }, { children: i18n.translate("newsletter.inline.button.continue") }), void 0) }), void 0)] }), void 0)] }), void 0)] }), void 0), countryCode !== 'de' && e$1("div", Object.assign({ class: "modal-registration-done" }, { children: [e$1("h1", Object.assign({ class: "font-bigger-header" }, { children: i18n.translate("newsletter.inline.registration.welcome.headline") }), void 0), e$1("div", Object.assign({ class: "font-welcome-text is-large hide-mobile" }, { children: i18n.translate("newsletter.inline.registration.welcome.text") }), void 0), e$1("div", Object.assign({ class: "welcome-text-container mobile-only" }, { children: [e$1("div", Object.assign({ class: "font-welcome-text is-large" }, { children: i18n.translate("newsletter.inline.registration.welcome.text") }), void 0), e$1("div", Object.assign({ class: "font-welcome-text" }, { children: i18n.translate("newsletter.inline.registration.email") }), void 0)] }), void 0), e$1("div", Object.assign({ class: "get-more-info" }, { children: e$1("div", Object.assign({ class: "column-right" }, { children: [e$1("div", Object.assign({ class: "font-welcome-text hide-mobile" }, { children: i18n.translate("newsletter.inline.registration.email") }), void 0), e$1("div", Object.assign({ class: "sign-up-button-container" }, { children: e$1("button", Object.assign({ class: "button", onClick: () => routeTo(`/${getCustomerGroupService().toPath()}`) }, { children: i18n.translate("newsletter.inline.button.continue") }), void 0) }), void 0)] }), void 0) }), void 0)] }), void 0)] }, void 0));
+}
+
+function NewsletterModal(props) {
+    const [complete, setComplete] = l(false);
+    const { actions } = F(WidgetContext);
+    const { trackEvent, dispatchGlobalEvent } = actions;
+    function onComplete() {
+        setComplete(true);
+        trackEvent({ action: EventAction.SUCCESS });
+        dispatchGlobalEvent(NewsletterSuccessEvent);
+    }
+    function onFailed() {
+        trackEvent({ action: EventAction.FAILED });
+    }
+    return (e$1("div", Object.assign({ class: "modal" }, { children: e$1("div", Object.assign({ class: "modal-content" }, { children: [e$1("div", Object.assign({ class: "modal-close-button", onClick: props.closeCallback }, { children: e$1("span", Object.assign({ "aria-hidden": "true", class: "icon solid" }, { children: e$1("svg", { children: e$1("use", { href: "/img/icons/sprites.svg#times-circle" }, void 0) }, void 0) }), void 0) }), void 0), e$1("div", Object.assign({ class: "content-center" }, { children: [!complete && e$1(Registration, { completionCallback: onComplete, failedCallback: onFailed }, void 0), complete && e$1(Completion, {}, void 0)] }), void 0)] }), void 0) }), void 0));
+}
+
+function NewsletterWidget() {
+    const [i18n, setI18n] = l(null);
+    const [countryCode] = l(getCountryService().getCountryCodeFromLocation());
+    const [email, setEmail] = l('');
+    const [active, setActive] = l(false);
+    const signUpButton = p$1();
+    y(() => {
+        const ts = getTranslationService();
+        ts.initTranslations('208671', countryCode)
+            .then(translations => setI18n(translations));
+    }, [countryCode]);
+    function handleEmailChanged(e) {
+        const value = e.target.value;
+        setEmail(value);
+        const button = signUpButton.current;
+        button.disabled = !validateEmail(value);
+    }
+    function validateEmail(email) {
+        return !!email.match(/\S+@\S+\.\S{2,}/g);
+    }
+    function dispatchEvent(event) {
+        document.dispatchEvent(new CustomEvent(NewsletterTrackingEvent, { detail: event }));
+    }
+    function dispatchGlobalEvent(event) {
+        window.dispatchEvent(new Event(event));
+    }
+    function onClose() {
+        setActive(false);
+        dispatchEvent({ action: EventAction.CLOSE });
+    }
+    function onOpen() {
+        setActive(true);
+        dispatchEvent({ action: EventAction.OPEN });
+    }
+    if (!i18n) {
+        return;
+    }
+    return (e$1(d, { children: [e$1("style", { children: styles$1 }, void 0), e$1(WidgetContext.Provider, Object.assign({ value: { countryCode: countryCode, i18n: i18n, email: email, actions: { validateEmail: validateEmail, trackEvent: dispatchEvent, dispatchGlobalEvent: dispatchGlobalEvent } } }, { children: e$1("div", Object.assign({ class: "inline-newsletter" }, { children: [e$1("div", Object.assign({ class: "newsletter-container" }, { children: [e$1("div", Object.assign({ class: "text-container" }, { children: [e$1("div", Object.assign({ class: "newsletter-header" }, { children: i18n.translate("newsletter.inline.headline") }), void 0), e$1("div", Object.assign({ class: "description" }, { children: i18n.translate("newsletter.inline.description") }), void 0)] }), void 0), e$1("div", Object.assign({ class: "controls" }, { children: [e$1("input", { type: "email", class: "text-input", onInput: handleEmailChanged, placeholder: i18n.translate('newsletter.inline.input.email.placeholder') }, void 0), e$1("button", Object.assign({ onClick: onOpen, ref: signUpButton, class: "button", disabled: true }, { children: i18n.translate("newsletter.inline.button.subscribe") }), void 0)] }), void 0), ['at', 'ch', 'cz', 'fr', 'hr', 'pl', 'ro', 'rs', 'ru', 'dk', 'fi', 'it', 'lu', 'nl', 'no', 'se'].includes(countryCode) && e$1("div", Object.assign({ class: "hint" }, { children: i18n.translate("newsletter.inline.footnote") }), void 0)] }), void 0), active && e$1(NewsletterModal, { closeCallback: onClose }, void 0)] }), void 0) }), void 0)] }, void 0));
+}
+register(NewsletterWidget, 'newsletter-widget', [], { shadow: true });
+
+var styles = ":host * {\n  font-family: \"Roboto\", sans-serif;\n  box-sizing: border-box;\n}\n\n.searchable-select-container {\n  position: relative;\n  width: 100%;\n}\n@media screen and (max-width: 767px) {\n  .searchable-select-container {\n    width: 100%;\n  }\n}\n\ninput {\n  display: block;\n  font-size: 1rem;\n  font-weight: 100;\n  width: 100%;\n  padding: 8px 0;\n  border: none;\n  border-bottom: solid 1px #b2b2b2;\n  color: #555555;\n  outline: none;\n  padding-right: 1.5rem;\n}\ninput:placeholder-shown {\n  border-color: #dbdbdb;\n}\n\n.dropdown {\n  background-color: white;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);\n  position: absolute;\n  width: 100%;\n  list-style: none;\n  margin: 1px 0 2rem;\n  padding: 0.5rem 0;\n  cursor: pointer;\n  z-index: 10;\n  top: 2.5rem;\n  max-height: 16rem;\n  overflow-y: auto;\n}\n.dropdown li {\n  padding: 0 0.5rem;\n  font-size: 0.875rem;\n  line-height: 1.75rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.dropdown li:hover {\n  background-color: #e9e8e8;\n}\n\n.icon {\n  position: absolute;\n  right: 0;\n  top: 50%;\n  transform: translateY(-50%);\n  cursor: pointer;\n  vertical-align: center;\n  width: 1rem;\n  height: 1rem;\n}\n\n/* Solid icons get a fill */\n.solid {\n  fill: #555555;\n  stroke: none;\n}";
+
+function SearchableSelect(props) {
+    const [items, setItems] = l([]);
+    const [filtered, setFiltered] = l([]);
+    const [input, setInput] = l('');
+    y(() => {
+        window.addEventListener('searchable-select-data', onData);
+    });
+    function onData(event) {
+        setItems(event.detail);
+    }
+    function selectItem(item) {
+        setInput(item.display);
+        setFiltered(null);
+    }
+    function renderItem(item) {
+        return e$1("li", Object.assign({ onClick: () => selectItem(item) }, { children: item.display }), void 0);
+    }
+    function renderDeleteIcon() {
+        return e$1("svg", Object.assign({ class: 'icon delete solid' }, { children: e$1("use", { href: "/img/icons/sprites.svg#times" }, void 0) }), void 0);
+    }
+    function renderArrowDown() {
+        return e$1("svg", Object.assign({ class: 'icon arrow solid' }, { children: e$1("use", { href: "/img/icons/sprites.svg#chevron-down" }, void 0) }), void 0);
+    }
+    function handleInputChange(event) {
+        if (event.key === 'Enter') {
+            setInput(null);
+        }
+        else {
+            let value = event.target.value;
+            setFiltered(items.filter(i => i.display.toLowerCase().includes(value.toLowerCase())));
+            setInput(value);
+        }
+    }
+    return (e$1(d, { children: [e$1("style", { children: styles }, void 0), e$1("div", Object.assign({ class: 'searchable-select-container' }, { children: [e$1("input", { class: 'input', placeholder: props.placeholder, type: 'text', value: input, onClick: () => setInput(null), onKeyUp: handleInputChange }, void 0), (input === null || input === void 0 ? void 0 : input.length) > 0 ? renderDeleteIcon() : renderArrowDown(), filtered && filtered.length > 0 &&
+                        e$1("ul", Object.assign({ className: 'dropdown' }, { children: filtered.map(renderItem) }), void 0)] }), void 0)] }, void 0));
+}
+register(SearchableSelect, 'searchable-select', [], { shadow: true });
+
+class AssetsService {
+    async loadAssets() {
+        if (this.assets) {
+            return this.assets;
+        }
+        try {
+            const result = await fetch(`${config.assetsServiceUrl}/resources`);
+            this.assets = await result.json();
+            return this.assets;
+        }
+        catch (e) {
+            console.error("error while loading assets:", e);
+        }
+    }
+}
+const assetsService = new AssetsService();
+
+let StoreLocator = class StoreLocator extends s {
+    constructor() {
+        super(...arguments);
+        this.resourceBasePath = 'store-locator';
+        this.resourceJs = 'store-locator.min.js';
+    }
+    createRenderRoot() {
+        return this;
+    }
+    async connectedCallback() {
+        super.connectedCallback();
+        this.assets = await assetsService.loadAssets();
+        const script = document.createElement('script');
+        script.src = `${this.assets[this.resourceBasePath].url}/${this.resourceJs}`;
+        this.appendChild(script);
+    }
+    render() {
+        return p `
+      <div class="content bulma" id="store-locator"></div>
+    `;
+    }
+};
+__decorate([
+    t()
+], StoreLocator.prototype, "assets", void 0);
+StoreLocator = __decorate([
+    n('store-locator')
+], StoreLocator);
+//# sourceMappingURL=widgets-baf00b3d.js.map

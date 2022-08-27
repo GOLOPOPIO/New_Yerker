@@ -1,0 +1,219 @@
+https://api.newyorker.de/csp/products/public/product/05.03.105.0053?country=ru
+
+{
+  "global_item_id": "GIID007315",
+  "id": "05.03.105.0037",
+  "country": "ru",
+  "maintenance_group": "T-Shirts, short sleeve Fashion",
+  "web_category_id": "WCA00221",
+  "web_category": "WCA00221",
+  "brand": "FSBN",
+  "sales_unit": 1,
+  "customer_group": "MALE",
+  "variants": [
+    {
+      "id": "001",
+      "product_id": "05.03.105.0053",
+      "publish_date": "2022-07-28T14:56:11.691Z",
+      "new_in": false,
+      "coming_soon": false,
+      "sale": false,
+      "color_name": "CID-01016",
+      "pantone_color": "00-0000 TCX",
+      "pantone_color_name": "Black",
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "color_group": "Schwarz",
+      "basic_color": "Grau/Schwarz",
+      "currency": "RUB",
+      "original_price": 1699,
+      "current_price": 1699,
+      "red_price_change": false,
+      "sizes": [
+        {
+          "size_value": "10",
+          "size_name": "XS",
+          "bar_code": "6405386151401013"
+        },
+        {
+          "size_value": "20",
+          "size_name": "S",
+          "bar_code": "6405386151402010"
+        },
+        {
+          "size_value": "30",
+          "size_name": "M",
+          "bar_code": "6405386151403017"
+        },
+        {
+          "size_value": "40",
+          "size_name": "L",
+          "bar_code": "6405386151404014"
+        },
+        {
+          "size_value": "50",
+          "size_name": "XL",
+          "bar_code": "6405386151405011"
+        },
+        {
+          "size_value": "60",
+          "size_name": "XXL",
+          "bar_code": "6405386151406018"
+        }
+      ],
+      "images": [
+        {
+          "key": "b1aca83b78cb0f97d33fef31a79cf6bf.jpg",
+          "type": "OUTFIT_IMAGE",
+          "angle": "FRONT",
+          "has_thumbnail": false,
+          "position": 0
+        },
+        {
+          "key": "d9f4063b2da2927f62303be508f35725.jpg",
+          "type": "OUTFIT_IMAGE",
+          "angle": "FRONT",
+          "has_thumbnail": false,
+          "position": 1
+        },
+        {
+          "key": "f6c14a3222955132c4dbc2f1c41d9f52.png",
+          "type": "CUTOUT",
+          "angle": "FRONT",
+          "has_thumbnail": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "id": "001",
+      "product_id": "05.03.105.0037",
+      "publish_date": "2022-08-07T04:23:58.263Z",
+      "new_in": false,
+      "coming_soon": false,
+      "sale": false,
+      "color_name": "CID-12228",
+      "pantone_color": "Original 038",
+      "pantone_color_name": "Original Grau",
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "color_group": "Grau",
+      "basic_color": "Grau/Schwarz",
+      "currency": "RUB",
+      "original_price": 1699,
+      "current_price": 1699,
+      "red_price_change": false,
+      "sizes": [
+        {
+          "size_value": "10",
+          "size_name": "XS",
+          "bar_code": "6403786151101012"
+        },
+        {
+          "size_value": "20",
+          "size_name": "S",
+          "bar_code": "6403786151102019"
+        },
+        {
+          "size_value": "30",
+          "size_name": "M",
+          "bar_code": "6403786151103016"
+        },
+        {
+          "size_value": "40",
+          "size_name": "L",
+          "bar_code": "6403786151104013"
+        },
+        {
+          "size_value": "50",
+          "size_name": "XL",
+          "bar_code": "6403786151105010"
+        },
+        {
+          "size_value": "60",
+          "size_name": "XXL",
+          "bar_code": "6403786151106017"
+        }
+      ],
+      "images": [
+        {
+          "key": "1898f378ab0f679701dc443a0b117ba3.jpg",
+          "type": "OUTFIT_IMAGE",
+          "angle": "FRONT",
+          "has_thumbnail": false,
+          "position": 2
+        },
+        {
+          "key": "58962b8a3a76940cc4ce01aaa00dcdde.jpg",
+          "type": "OUTFIT_IMAGE",
+          "angle": "FRONT",
+          "has_thumbnail": false,
+          "position": 0
+        },
+        {
+          "key": "33e3707cdac19a7dfdb717d72b9b9aba.jpg",
+          "type": "OUTFIT_IMAGE",
+          "angle": "FRONT",
+          "has_thumbnail": false,
+          "position": 1
+        },
+        {
+          "key": "cf180c5c6abc12a05bec73e3791c4a8a.png",
+          "type": "CUTOUT",
+          "angle": "FRONT",
+          "has_thumbnail": true,
+          "position": 3
+        }
+      ]
+    }
+  ],
+  "descriptions": [
+    {
+      "language": "EN",
+      "description": "T-shirt with round neck"
+    },
+    {
+      "language": "HR",
+      "description": "Majica kratkih rukava s okruglim ovratnikom"
+    },
+    {
+      "language": "BS",
+      "description": "Majica s okruglim izrezom"
+    },
+    {
+      "language": "CS",
+      "description": "Tričko s kulatým výstřihem"
+    },
+    {
+      "language": "DE",
+      "description": "T-Shirt mit Rundhals"
+    },
+    {
+      "language": "PL",
+      "description": "T-Shirt z okrągłym dekoltem"
+    },
+    {
+      "language": "RU",
+      "description": "Футболка с круглым вырезом"
+    },
+    {
+      "language": "SL",
+      "description": "Kratka majica z okroglim izrezom"
+    },
+    {
+      "language": "SR",
+      "description": "Majica kratkih rukava sa okruglim izrezom"
+    },
+    {
+      "language": "BE",
+      "description": "Футболка с круглым вырезом"
+    }
+  ]
+}
+
+
+
+
+https://nyblobstoreprod.blob.core.windows.net/product-images-public/f6c14a3222955132c4dbc2f1c41d9f52.png
